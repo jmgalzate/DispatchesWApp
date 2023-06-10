@@ -8,3 +8,10 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+
+###> config and local files ###
+
+/.DS_Store
+/Dockerfile
+/docker-compose.yml
+/docker/
