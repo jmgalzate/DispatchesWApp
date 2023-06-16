@@ -5,17 +5,17 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Psr\Log\LoggerInterface;
 
 
 class ContapymeController extends AbstractController
 {
     private array $_arrParams;
-    private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(private HttpClientInterface $client, private LoggerInterface $logger)
     {
-        $this->logger = $logger;
+
     }
 
     #[Route('/contapyme', name: 'api_contapyme')]
@@ -47,12 +47,12 @@ class ContapymeController extends AbstractController
             'path' => $endpoint,
             'method' => 'getAuth',
             'parameters' => $this->_arrParams,
-            'response' =>  $this->apiRequest($this->_arrParams, $endpoint)
+            'response' =>  $this->request($this->_arrParams, $endpoint)
         ]);
     }
 
-    #[Route('/contapyme/Logout/{keyagent}', name: 'Logout')]
-    public function Logout(string $keyagent): JsonResponse
+    #[Route('/contapyme/logout/{keyagent}', name: 'logout')]
+    public function logout(string $keyagent): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"Logout"/';
 
@@ -65,13 +65,33 @@ class ContapymeController extends AbstractController
             'method' => 'Logout',
             'path' => $endpoint,
             'parameters' => $this->_arrParams,
-            'response' => $this->apiRequest($this->_arrParams, $endpoint)
+            'response' => $this->request($this->_arrParams, $endpoint)
         ]);
     }
 
-    #[Route('/contapyme/request/{params}/{endpoint}', name: 'apiRequest')]
-    public function apiRequest(array $params, string $endpoint): JsonResponse
+    #[Route('/contapyme/request/{params}/{endpoint}', name: 'request')]
+    public function request(array $params, string $endpoint): array
     {
-       return new JsonResponse('{"error": "No se ha podido conectar con el servidor"}');
+        try{
+            $response = $this->client->request('POST', $endpoint, [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json'
+                ],
+                'body' => json_encode(['_parameters' => $params])
+            ]);
+            
+            $this->logger->info('API request successful', [
+                'endpoint' => $endpoint,
+                'params' => $params,
+                'response' => $response->toArray()
+            ]);
+           return $response->toArray();
+        } catch (\Exception $e){
+            return [
+                'error' => $e->getMessage()
+            ];
+        }
+        
     }
 }
