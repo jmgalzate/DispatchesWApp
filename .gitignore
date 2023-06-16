@@ -1,6 +1,7 @@
 
 ###> symfony/framework-bundle ###
 /.env.local
+/.env.dev
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
@@ -12,6 +13,11 @@
 ###> config and local files ###
 
 /.DS_Store
+/.vscode/
 /Dockerfile
 /docker-compose.yml
 /docker/
+/supervisord.log
+/supervisord.pid
+
+/src/.DS_Store
