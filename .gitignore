@@ -19,5 +19,6 @@
 /docker/
 /supervisord.log
 /supervisord.pid
+/.idea/
 
 /src/.DS_Store

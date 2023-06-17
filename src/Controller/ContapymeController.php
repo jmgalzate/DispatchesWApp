@@ -2,20 +2,23 @@
 
 namespace App\Controller;
 
+use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Psr\Log\LoggerInterface;
-
 
 class ContapymeController extends AbstractController
 {
-    private array $_arrParams;
+    private array $arrParams;
 
-    public function __construct(private HttpClientInterface $client, private LoggerInterface $logger)
-    {
-
+    public function __construct(
+        private readonly HttpClientInterface $client,
+        private readonly LoggerInterface $logger
+    ) {
+        $this->arrParams = ['', '', $_ENV['API_IAPP'], (string)random_int(0, 9)];
     }
 
     #[Route('/contapyme', name: 'api_contapyme')]
@@ -30,26 +33,16 @@ class ContapymeController extends AbstractController
     }
 
     #[Route('/contapyme/getauth', name: 'getauth')]
-    public function getAuth(): JsonResponse
+    public function getAuth(Request $request): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/';
-        $this->_arrParams[0] = [
+        $this->arrParams[0] = [
             'email' => $_ENV['API_USERNAME'],
             'password' => $_ENV['API_PASSWORD'],
             'id_maquina' => $_ENV['API_MACHINE_ID']
         ];
-        $this->_arrParams[1] = '';
-        $this->_arrParams[2] = $_ENV['API_IAPP'];
-        $this->_arrParams[3] = (string)random_int(0,9);
 
-        return new JsonResponse(
-            [
-                'path' => $endpoint,
-                'method' => 'getAuth',
-                'parameters' => $this->_arrParams,
-                'response' =>  $this->request($this->_arrParams, $endpoint)
-            ]
-            );
+        return $this->sendRequest($this->arrParams, $endpoint);
     }
 
     #[Route('/contapyme/logout/{keyagent}', name: 'logout')]
@@ -57,25 +50,34 @@ class ContapymeController extends AbstractController
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"Logout"/';
 
-        $this->_arrParams[0] = '{}';
-        $this->_arrParams[1] = $keyagent;
-        $this->_arrParams[2] = $_ENV['API_IAPP'];
-        $this->_arrParams[3] = (string)random_int(0,9);
+        $this->arrParams[0] = '{}';
+        $this->arrParams[1] = $keyagent;
 
-        return new JsonResponse(
-            [
-                'path' => $endpoint,
-                'method' => 'Logout',
-                'parameters' => $this->_arrParams,
-                'response' =>  $this->request($this->_arrParams, $endpoint)
-            ]
-            );
+        return $this->sendRequest($this->arrParams, $endpoint);
     }
 
-    #[Route('/contapyme/request/{params}/{endpoint}', name: 'request')]
-    public function request(array $params, string $endpoint): array
+    #[Route('/contapyme/{action}/{keyagent}/{order}', name: 'action')]
+    public function action(string $action, string $keyagent, string $order): JsonResponse
     {
-        try{
+        $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/';
+
+        $this->arrParams[0] = [
+            'accion' => $action,
+            'operaciones' => [
+                ['inumoper' => $order],
+                ['itdoper' => $_ENV['API_ITDOPER']]
+            ]
+        ];
+        $this->arrParams[1] = $keyagent;
+
+        return $this->sendRequest($this->arrParams, $endpoint);
+    }
+
+    // TODO implement method get products
+
+    private function sendRequest(array $params, string $endpoint): JsonResponse
+    {
+        try {
             $response = $this->client->request('POST', $endpoint, [
                 'headers' => [
                     'Content-Type' => 'application/json',
@@ -83,18 +85,32 @@ class ContapymeController extends AbstractController
                 ],
                 'body' => json_encode(['_parameters' => $params])
             ]);
-            
+
+            $responseData = $response->toArray();
+
             $this->logger->info('API request successful', [
                 'endpoint' => $endpoint,
                 'params' => $params,
-                'response' => $response->toArray()
+                'response' => $responseData
             ]);
-           return $response->toArray();
-        } catch (\Exception $e){
-            return [
-                'error' => $e->getMessage()
-            ];
+
+            return new JsonResponse([
+                'path' => $endpoint,
+                'parameters' => $params,
+                'response' => $responseData
+            ]);
+        } catch (Exception $e) {
+            $errorMessage = $e->getMessage();
+
+            $this->logger->error('API request failed', [
+                'endpoint' => $endpoint,
+                'params' => $params,
+                'error' => $errorMessage
+            ]);
+
+            return new JsonResponse([
+                'error' => $errorMessage
+            ]);
         }
-        
     }
 }
