@@ -6,7 +6,6 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -16,8 +15,9 @@ class ContapymeController extends AbstractController
 
     public function __construct(
         private readonly HttpClientInterface $client,
-        private readonly LoggerInterface $logger
-    ) {
+        private readonly LoggerInterface     $logger
+    )
+    {
         $this->arrParams = ['', '', $_ENV['API_IAPP'], (string)random_int(0, 9)];
     }
 
@@ -33,7 +33,7 @@ class ContapymeController extends AbstractController
     }
 
     #[Route('/contapyme/getauth', name: 'getauth')]
-    public function getAuth(Request $request): JsonResponse
+    public function getAuth(): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/';
         $this->arrParams[0] = [
@@ -64,8 +64,10 @@ class ContapymeController extends AbstractController
         $this->arrParams[0] = [
             'accion' => $action,
             'operaciones' => [
-                ['inumoper' => $order],
-                ['itdoper' => $_ENV['API_ITDOPER']]
+                [
+                    'inumoper' => $order,
+                    'itdoper' => $_ENV['API_ITDOPER']
+                ]
             ]
         ];
         $this->arrParams[1] = $keyagent;
@@ -73,17 +75,14 @@ class ContapymeController extends AbstractController
         return $this->sendRequest($this->arrParams, $endpoint);
     }
 
+    //TODO implement method for SAVE the order
     // TODO implement method get products
 
     private function sendRequest(array $params, string $endpoint): JsonResponse
     {
         try {
             $response = $this->client->request('POST', $endpoint, [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ],
-                'body' => json_encode(['_parameters' => $params])
+                'json' => ['_parameters' => $params]
             ]);
 
             $responseData = $response->toArray();
@@ -91,7 +90,7 @@ class ContapymeController extends AbstractController
             $this->logger->info('API request successful', [
                 'endpoint' => $endpoint,
                 'params' => $params,
-                'response' => $responseData
+                'responseData' => $responseData
             ]);
 
             return new JsonResponse([
