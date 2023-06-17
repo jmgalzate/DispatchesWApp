@@ -29,7 +29,7 @@ class ContapymeController extends AbstractController
         ]);
     }
 
-    #[Route('/contapyme/getauth', name: 'getAuth')]
+    #[Route('/contapyme/getauth', name: 'getauth')]
     public function getAuth(): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/';
@@ -42,13 +42,14 @@ class ContapymeController extends AbstractController
         $this->_arrParams[2] = $_ENV['API_IAPP'];
         $this->_arrParams[3] = (string)random_int(0,9);
 
-
-        return $this->json([
-            'path' => $endpoint,
-            'method' => 'getAuth',
-            'parameters' => $this->_arrParams,
-            'response' =>  $this->request($this->_arrParams, $endpoint)
-        ]);
+        return new JsonResponse(
+            [
+                'path' => $endpoint,
+                'method' => 'getAuth',
+                'parameters' => $this->_arrParams,
+                'response' =>  $this->request($this->_arrParams, $endpoint)
+            ]
+            );
     }
 
     #[Route('/contapyme/logout/{keyagent}', name: 'logout')]
@@ -61,12 +62,14 @@ class ContapymeController extends AbstractController
         $this->_arrParams[2] = $_ENV['API_IAPP'];
         $this->_arrParams[3] = (string)random_int(0,9);
 
-        return $this->json([
-            'method' => 'Logout',
-            'path' => $endpoint,
-            'parameters' => $this->_arrParams,
-            'response' => $this->request($this->_arrParams, $endpoint)
-        ]);
+        return new JsonResponse(
+            [
+                'path' => $endpoint,
+                'method' => 'Logout',
+                'parameters' => $this->_arrParams,
+                'response' =>  $this->request($this->_arrParams, $endpoint)
+            ]
+            );
     }
 
     #[Route('/contapyme/request/{params}/{endpoint}', name: 'request')]
