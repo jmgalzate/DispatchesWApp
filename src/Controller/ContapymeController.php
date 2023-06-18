@@ -1,7 +1,5 @@
 <?php
 
-// do you see something here that could be managed by a service instead of a controller?
-
 namespace App\Controller;
 
 use App\Service\ContapymeService;
@@ -32,7 +30,6 @@ class ContapymeController extends AbstractController
             'password' => $_ENV['API_PASSWORD'],
             'id_maquina' => $_ENV['API_MACHINE_ID']
         ];
-
         return $this->apiService->sendRequest($this->arrParams, $endpoint);
     }
 
@@ -47,7 +44,7 @@ class ContapymeController extends AbstractController
         return $this->apiService->sendRequest($this->arrParams, $endpoint);
     }
 
-    #[Route('/contapyme/{action}/{keyagent}/{order}', name: 'action')]
+    #[Route('/contapyme/action={action}/{keyagent}/{order}', name: 'action')]
     public function action(string $action, string $keyagent, string $order, array $newOrder = []): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/';
@@ -76,10 +73,23 @@ class ContapymeController extends AbstractController
         }
 
         $this->arrParams[1] = $keyagent;
-
         return $this->apiService->sendRequest($this->arrParams, $endpoint);
     }
 
-    // TODO implement method get products
-
+    #[Route('/contapyme/PRODUCTS/{keyagent}', name: 'getProducts')]
+    public function getProducts(string $keyagent): JsonResponse
+    {
+        $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatElemInv/"GetListaElemInv"/';
+        $this->arrParams[0] = [
+            'datospagina' => [
+                'cantidadregistros' => "5",
+                'pagina' => ''
+            ],
+            'camposderetorno' => [
+                'irecurso', 'nrecurso', 'clase2'
+            ]
+        ];
+        $this->arrParams[1] = $keyagent;
+        return $this->apiService->sendRequest($this->arrParams, $endpoint);
+    }
 }
