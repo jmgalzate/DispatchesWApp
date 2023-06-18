@@ -13,6 +13,9 @@ class ContapymeController extends AbstractController
 {
     private array $arrParams;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(
         private readonly HttpClientInterface $client,
         private readonly LoggerInterface     $logger
@@ -57,25 +60,38 @@ class ContapymeController extends AbstractController
     }
 
     #[Route('/contapyme/{action}/{keyagent}/{order}', name: 'action')]
-    public function action(string $action, string $keyagent, string $order): JsonResponse
+    public function action(string $action, string $keyagent, string $order, array $newOrder = []): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/';
 
-        $this->arrParams[0] = [
-            'accion' => $action,
-            'operaciones' => [
-                [
-                    'inumoper' => $order,
-                    'itdoper' => $_ENV['API_ITDOPER']
+        if ($action == 'SAVE') {
+            $this->arrParams[0] = [
+                'accion' => $action,
+                'operaciones' => [
+                    [
+                        'inumoper' => $order,
+                        'itdoper' => $_ENV['API_ITDOPER']
+                    ]
+                ],
+                'oprdata' => $newOrder
+            ];
+        } else {
+            $this->arrParams[0] = [
+                'accion' => $action,
+                'operaciones' => [
+                    [
+                        'inumoper' => $order,
+                        'itdoper' => $_ENV['API_ITDOPER']
+                    ]
                 ]
-            ]
-        ];
+            ];
+        }
+
         $this->arrParams[1] = $keyagent;
 
         return $this->sendRequest($this->arrParams, $endpoint);
     }
 
-    //TODO implement method for SAVE the order
     // TODO implement method get products
 
     private function sendRequest(array $params, string $endpoint): JsonResponse
