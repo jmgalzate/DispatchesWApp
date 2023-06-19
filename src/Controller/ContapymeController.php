@@ -27,7 +27,7 @@ class ContapymeController extends AbstractController
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/';
         $this->arrParams[0] = [
             'email' => $_ENV['API_USERNAME'],
-            'password' => $_ENV['API_PASSWORD'],
+            'password' => md5($_ENV['API_PASSWORD']),
             'id_maquina' => $_ENV['API_MACHINE_ID']
         ];
         return $this->apiService->sendRequest($this->arrParams, $endpoint);
