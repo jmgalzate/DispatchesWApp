@@ -22,24 +22,27 @@ class ContapymeService
             ]);
 
             $responseData = $response->toArray();
+            $header = $responseData["result"][0]["encabezado"];
+            $statusCode = $response->getStatusCode();
+            $body = $responseData["result"][0]["respuesta"]["datos"];
 
             $this->logger->info('API request successful', [
                 'endpoint' => $endpoint,
+                'statusCode' => $statusCode,
                 'params' => $params,
-                'responseData' => $responseData
+                'header' => $header
             ]);
 
             return new JsonResponse([
-                'path' => $endpoint,
-                'parameters' => $params,
-                'response' => $responseData
+                'body' => $body
             ]);
+
         } catch (Exception $e) {
             $errorMessage = $e->getMessage();
 
             $this->logger->error('API request failed', [
                 'endpoint' => $endpoint,
-                'params' => $params,
+                //'params' => $params,
                 'error' => $errorMessage
             ]);
 
@@ -48,6 +51,4 @@ class ContapymeService
             ]);
         }
     }
-
-    //TODO implement method for returning only the data from the response
 }

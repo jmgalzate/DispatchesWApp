@@ -30,7 +30,20 @@ class ContapymeController extends AbstractController
             'password' => md5($_ENV['API_PASSWORD']),
             'id_maquina' => $_ENV['API_MACHINE_ID']
         ];
-        return $this->apiService->sendRequest($this->arrParams, $endpoint);
+
+        $responseData = $this->apiService->sendRequest($this->arrParams, $endpoint);
+        $responseDataArray = json_decode($responseData->getContent(), true);
+
+        try{
+            setcookie('keyagent', $responseDataArray['body']['keyagente'], time() + 3600, '/');
+            return new JsonResponse([
+                'Confirmation'=> 'Cookie setted'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'Error'=> $e->getMessage()
+            ]);
+        }
     }
 
     #[Route('/contapyme/logout/{keyagent}', name: 'logout')]
