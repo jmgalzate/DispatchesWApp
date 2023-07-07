@@ -16,6 +16,8 @@
         "symfony/maker-bundle": "^1.49",
         "symfony/monolog-bundle": "^3.8",
         "symfony/runtime": "6.3.*",
+        "symfony/twig-bundle": "6.3.*",
+        "symfony/ux-twig-component": "*",
         "symfony/yaml": "6.3.*"
     },
     "config": {
