@@ -10,8 +10,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class ContapymeService
 {
     public function __construct(
-        private HttpClientInterface $client,
-        private LoggerInterface $logger
+        private readonly HttpClientInterface $client,
+        private readonly LoggerInterface $logger
     ) {}
 
     public function sendRequest(array $params, string $endpoint): JsonResponse

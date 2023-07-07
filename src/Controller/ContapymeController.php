@@ -34,14 +34,14 @@ class ContapymeController extends AbstractController
         $responseData = $this->apiService->sendRequest($this->arrParams, $endpoint);
         $responseDataArray = json_decode($responseData->getContent(), true);
 
-        try{
+        try {
             setcookie('keyagent', $responseDataArray['body']['keyagente'], time() + 3600, '/');
             return new JsonResponse([
-                'Confirmation'=> 'Cookie setted'
+                'Confirmation' => 'Cookie set'
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
-                'Error'=> $e->getMessage()
+                'Error' => $e->getMessage()
             ]);
         }
     }
@@ -54,7 +54,20 @@ class ContapymeController extends AbstractController
         $this->arrParams[0] = '{}';
         $this->arrParams[1] = $keyagent;
 
-        return $this->apiService->sendRequest($this->arrParams, $endpoint);
+        $responseData = $this->apiService->sendRequest($this->arrParams, $endpoint);
+        $responseDataArray = json_decode($responseData->getContent(), true);
+
+        try {
+            setcookie('keyagent', '', time() + 3600, '/');
+            return new JsonResponse([
+                'Session closed' => $responseDataArray['body']['cerro'],
+                'Confirmation' => 'Cookie unset'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'Error' => $e->getMessage()
+            ]);
+        }
     }
 
     #[Route('/contapyme/action={action}/{keyagent}/{order}', name: 'action')]
@@ -86,7 +99,18 @@ class ContapymeController extends AbstractController
         }
 
         $this->arrParams[1] = $keyagent;
-        return $this->apiService->sendRequest($this->arrParams, $endpoint);
+        $responseData = $this->apiService->sendRequest($this->arrParams, $endpoint);
+        $responseDataArray = json_decode($responseData->getContent(), true);
+
+        try {
+            return new JsonResponse([
+                'body' => $responseDataArray['body']
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'Error' => $e->getMessage()
+            ]);
+        }
     }
 
     #[Route('/contapyme/PRODUCTS/{keyagent}', name: 'getProducts')]
@@ -102,7 +126,19 @@ class ContapymeController extends AbstractController
                 'irecurso', 'nrecurso', 'clase2'
             ]
         ];
+
         $this->arrParams[1] = $keyagent;
-        return $this->apiService->sendRequest($this->arrParams, $endpoint);
+        $responseData = $this->apiService->sendRequest($this->arrParams, $endpoint);
+        $responseDataArray = json_decode($responseData->getContent(), true);
+
+        try {
+            return new JsonResponse([
+                'body' => $responseDataArray['body']
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'Error' => $e->getMessage()
+            ]);
+        }
     }
 }
