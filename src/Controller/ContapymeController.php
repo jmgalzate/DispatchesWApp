@@ -36,7 +36,7 @@ class ContapymeController extends AbstractController
         try {
             setcookie('keyagent', $responseDataArray['body']['keyagente'], time() + 3600, '/');
             return new JsonResponse([
-                'Confirmation' => 'Cookie set'
+                'Confirmation' => 'Cookie set: '. $_COOKIE["keyagent"]
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
@@ -59,7 +59,7 @@ class ContapymeController extends AbstractController
             setcookie('keyagent', '', time() + 3600, '/');
             return new JsonResponse([
                 'Session closed' => $responseDataArray['body']['cerro'],
-                'Confirmation' => 'Cookie unset'
+                'Confirmation' => 'Cookie unset: '. $_COOKIE["keyagent"]
             ]);
         } catch (\Exception $e) {
             return new JsonResponse([
