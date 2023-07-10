@@ -21,7 +21,6 @@ class ContapymeController extends AbstractController
         $this->arrParams = ['', '', $_ENV['API_IAPP'], (string)random_int(0, 9)];
     }
 
-    #[Route('/contapyme/getauth', name: 'getauth')]
     public function getAuth(): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/';
@@ -46,7 +45,6 @@ class ContapymeController extends AbstractController
         }
     }
 
-    #[Route('/contapyme/logout/{keyagent}', name: 'logout')]
     public function logout(string $keyagent): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"Logout"/';
@@ -70,7 +68,6 @@ class ContapymeController extends AbstractController
         }
     }
 
-    #[Route('/contapyme/action={action}/{keyagent}/{order}', name: 'action')]
     public function action(string $action, string $keyagent, string $order, array $newOrder = []): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/';
@@ -113,7 +110,6 @@ class ContapymeController extends AbstractController
         }
     }
 
-    #[Route('/contapyme/PRODUCTS/{keyagent}', name: 'getProducts')]
     public function getProducts(string $keyagent): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatElemInv/"GetListaElemInv"/';
