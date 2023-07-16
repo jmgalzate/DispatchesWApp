@@ -1,24 +1,18 @@
 <?php
-
 namespace App\Service;
-
-use Exception;
-use App\Controller\ContapymeController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 
 class DeliveryService
 {
-    private ContapymeController $contapymeController;
+    private ContapymeService $contapymeService;
 
-    public function __construct(ContapymeController $contapymeController)
+    public function __construct(ContapymeService $contapymeService)
     {
-        $this->contapymeController = $contapymeController;
+        $this->contapymeService = $contapymeService;
     }
 
     public function getOrder(string $orderNumber): array
     {
-        $order = $this->contapymeController->action(action: 'LOAD', keyagent: $_COOKIE["keyagent"], order: $orderNumber);
+        $order = $this->contapymeService->action(action: 'LOAD', keyagent: $_COOKIE["keyagent"], order: $orderNumber);
         return json_decode($order->getContent(), true);
     }
-
 }
