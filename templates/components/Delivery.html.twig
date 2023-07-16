@@ -1,15 +1,12 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
+    <h1>Despachar orden</h1>
 
+    <div>
+        <input type="text" id="orderNumberInput">
+        <button onclick="searchOrder()">Search Order</button>
+    </div>
+    <div id="result"></div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
-
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code><a href="{{ '/var/www/html/src/Controller/DeliveryController.php'|file_link(0) }}">src/Controller/DispatchController.php</a></code></li>
-        <li>Your template at <code><a href="{{ '/var/www/html/templates/dispatch/Delivery.html.twig'|file_link(0) }}">templates/dispatch/index.html.twig</a></code></li>
-    </ul>
-</div>
 {% endblock %}

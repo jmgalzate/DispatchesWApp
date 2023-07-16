@@ -17,10 +17,7 @@ class DeliveryService
 
     public function getOrder(string $orderNumber): array
     {
-        $auth = $this->contapymeController->getAuth();
         $order = $this->contapymeController->action(action: 'LOAD', keyagent: $_COOKIE["keyagent"], order: $orderNumber);
-        $logout = $this->contapymeController->logout(keyagent: $_COOKIE["keyagent"]);
-
         return json_decode($order->getContent(), true);
     }
 
