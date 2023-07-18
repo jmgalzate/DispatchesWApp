@@ -10,10 +10,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class ContapymeService
 {
     private array $arrParams;
+
     public function __construct(
         private readonly HttpClientInterface $client,
-        private readonly LoggerInterface $logger
-    ) {
+        private readonly LoggerInterface     $logger
+    )
+    {
         $this->arrParams = ['', '', $_ENV['API_IAPP'], (string)random_int(0, 9)];
     }
 
@@ -33,7 +35,8 @@ class ContapymeService
                 'endpoint' => $endpoint,
                 'statusCode' => $statusCode,
                 'params' => $params,
-                'header' => $header
+                'header' => $header,
+                'body' => $body,
             ]);
 
             return new JsonResponse([
@@ -45,7 +48,6 @@ class ContapymeService
 
             $this->logger->error('API request failed', [
                 'endpoint' => $endpoint,
-                //'params' => $params,
                 'error' => $errorMessage
             ]);
 
@@ -67,16 +69,9 @@ class ContapymeService
         $responseData = $this->sendRequest($this->arrParams, $endpoint);
         $responseDataArray = json_decode($responseData->getContent(), true);
 
-        try {
-            setcookie('keyagent', $responseDataArray['body']['keyagente'], time() + 3600, '/');
-            return new JsonResponse([
-                'Confirmation' => 'Cookie set: '. $_COOKIE["keyagent"]
-            ]);
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'Error' => $e->getMessage()
-            ]);
-        }
+        return new JsonResponse([
+            'keyagent' => $responseDataArray['body']['keyagente']
+        ]);
     }
 
     public function logout(string $keyagent): JsonResponse
@@ -89,17 +84,9 @@ class ContapymeService
         $responseData = $this->sendRequest($this->arrParams, $endpoint);
         $responseDataArray = json_decode($responseData->getContent(), true);
 
-        try {
-            setcookie('keyagent', '', time() + 3600, '/');
-            return new JsonResponse([
-                'Session closed' => $responseDataArray['body']['cerro'],
-                'Confirmation' => 'Cookie unset: '. $_COOKIE["keyagent"]
-            ]);
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'Error' => $e->getMessage()
-            ]);
-        }
+        return new JsonResponse([
+            'Session closed' => $responseDataArray['body']['cerro']
+        ]);
     }
 
     public function action(string $action, string $keyagent, string $order, array $newOrder = []): JsonResponse
