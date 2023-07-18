@@ -42,12 +42,13 @@
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
            data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
             {# Check if the 'my_variable' session value is set #}
             {% if app.session.get('name') is not null %}
+                <img src="{{ asset('img/open.jpg') }}" alt="" width="32" height="32" class="rounded-circle me-2">
                 {# If 'my_variable' session value is set, display it #}
                 {{ app.session.get('name') }}
             {% else %}
+                <img src="{{ asset('img/closed.jpg') }}" alt="" width="32" height="32" class="rounded-circle me-2">
                 {# If 'my_variable' session value is not set, show a default message #}
                 <strong>No Session</strong>
             {% endif %}
