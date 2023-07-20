@@ -24,9 +24,7 @@ class SessionController extends AbstractController
             $this->requestStack->getSession()->set('name', 'Login error');
         }
 
-        return $this->render('components/Home.html.twig', [
-            'keyagent' => $this->requestStack->getSession()->get('name')
-        ]);
+        return $this->redirectToRoute('homepage');
     }
 
     #[Route('/session/logout', name: 'app_session_logout')]
@@ -40,8 +38,6 @@ class SessionController extends AbstractController
             $response = 'Logout error';
         }
 
-        return $this->render('components/Home.html.twig', [
-            'keyagent' => $response
-        ]);
+        return $this->redirectToRoute('homepage');
     }
 }
