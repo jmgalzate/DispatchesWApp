@@ -1,12 +1,73 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Despachos{% endblock %}
+
 {% block body %}
-    <h1>Despachar orden</h1>
 
-    <div>
-        <input type="text" id="orderNumberInput">
-        <button onclick="searchOrder()">Search Order</button>
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">Despachar Orden</h1>
+        </div>
+        <div>
+            <label for="orderNumberInput"></label>
+            <input type="text" id="orderNumberInput" placeholder="Número de orden">
+            <button onclick="searchOrder()" class="btn btn-primary">Buscar orden</button>
+        </div>
+        <div id="result"></div>
     </div>
-    <div id="result"></div>
 
+    <div class="row align-items-md-stretch" style="padding-left: 2%; padding-right: 2%;">
+        <div class="col-md-6">
+            <div class="h-100 p-5  border rounded-3" style="background-color: #93c5fd">
+                <div>
+                    <p>Número de Orden: </p>
+                    <p>Fecha de Orden: </p>
+                    <p>Cliente: </p>
+                </div>
+                <div>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Nombre del Producto</th>
+                                <th>Cant. Requerida</th>
+                                <th>Cant. a Despachar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>Producto 1</td>
+                                <td>10</td>
+                                <td>10</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="h-100 p-5 bg-light border rounded-3">
+                <div>
+                    <label for="productInput">Escanear producto:</label>
+                    <input type="text" id="productInput" placeholder="Código de Barras" class="form-control">
+                </div>
+                <div>
+                    <table class="table table-hover">
+                        <thead>
+                        <tr>
+                            <th>
+                                Código de Barras
+                            </th>
+                            <th>Resultado escaneo</th>
+                        </tr>
+                        </thead>
+                        <tbody id="scannedProducts">
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

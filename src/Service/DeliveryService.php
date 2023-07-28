@@ -4,6 +4,7 @@ namespace App\Service;
 class DeliveryService
 {
     private ContapymeService $contapymeService;
+    private array $order;
 
     public function __construct(ContapymeService $contapymeService)
     {
