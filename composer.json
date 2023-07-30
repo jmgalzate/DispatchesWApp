@@ -7,6 +7,9 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^2.10",
+        "doctrine/doctrine-migrations-bundle": "^3.2",
+        "doctrine/orm": "^2.15",
         "symfony/asset": "6.3.*",
         "symfony/console": "6.3.*",
         "symfony/dotenv": "6.3.*",
@@ -16,6 +19,7 @@
         "symfony/http-foundation": "6.3.*",
         "symfony/maker-bundle": "^1.49",
         "symfony/monolog-bundle": "^3.8",
+        "symfony/requirements-checker": "^2.0",
         "symfony/runtime": "6.3.*",
         "symfony/twig-bundle": "6.3.*",
         "symfony/ux-twig-component": "*",
@@ -52,7 +56,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "requirements-checker": "script"
         },
         "post-install-cmd": [
             "@auto-scripts"

@@ -10,18 +10,22 @@ use App\Service\DeliveryService;
 
 class DeliveryController extends AbstractController
 {
+
+    public function __construct(private readonly DeliveryService $deliveryService)
+    {
+    }
     #[Route('/delivery', name: 'home_delivery')]
     public function index(): Response
     {
         return $this->render('components/Delivery.html.twig', [
-            'controller_name' => 'DeliveryController',
+            'title' => 'Despachar Orden'
         ]);
     }
 
     #[Route('/delivery/{orderNumber}', name: 'delivery')]
-    public function delivery(string $orderNumber, DeliveryService $deliveryService): JsonResponse
+    public function delivery(string $orderNumber): JsonResponse
     {
-        $order = $deliveryService->getOrder($orderNumber);
+        $order = $this->deliveryService->getOrder($orderNumber);
         return new JsonResponse($order);
     }
 

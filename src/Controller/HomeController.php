@@ -12,7 +12,8 @@ class HomeController extends AbstractController
     public function index(): Response
     {
         return $this->render('components/Home.html.twig', [
-            'controller_name' => 'HomePageController',
+            'title' => 'Bienvenid@ al Portal de Despachos',
+            'dispatchButton' => 'Nuevo despacho',
         ]);
     }
 }

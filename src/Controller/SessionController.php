@@ -19,9 +19,9 @@ class SessionController extends AbstractController
         try {
             $response = $this->contapymeService->getAuth();
             $response = json_decode($response->getContent(), true);
-            $this->requestStack->getSession()->set('name', $response['keyagent']);
+            $this->requestStack->getSession()->set('keyagent', $response['keyagent']);
         } catch (\Throwable $th) {
-            $this->requestStack->getSession()->set('name', 'Login error');
+            $this->requestStack->getSession()->set('keyagent', 'Login error');
         }
 
         return $this->redirectToRoute('homepage');
@@ -31,8 +31,8 @@ class SessionController extends AbstractController
     public function logout(): Response
     {
         try {
-            $logout = $this->contapymeService->logout($this->requestStack->getSession()->get('name'));
-            $this->requestStack->getSession()->remove('name');
+            $logout = $this->contapymeService->logout($this->requestStack->getSession()->get('keyagent'));
+            $this->requestStack->getSession()->remove('keyagent');
             $response = 'No Session';
         } catch (\Throwable $th) {
             $response = 'Logout error';

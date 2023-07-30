@@ -6,9 +6,12 @@
 
     <div class="p-5 mb-4 bg-light rounded-3">
         <div class="container-fluid py-5">
-            <h1 class="display-5 fw-bold">Bienvenid@ al Portal de Despachos </h1>
+            <h1 class="display-5 fw-bold">{{ title }}</h1>
         </div>
-        <a href="{{ path('home_delivery') }}" class="btn btn-primary"><i class="bi bi-truck"></i> Despachar pedido</a>
+        {% if app.session.get('keyagent') is not null %}
+            <a href="{{ path('home_delivery') }}" class="btn btn-primary"><i class="bi bi-truck"></i> {{ dispatchButton
+                }}</a>
+        {% endif %}
     </div>
 
     <div class="row align-items-md-stretch" style="padding-left: 2%; padding-right: 2%;">
