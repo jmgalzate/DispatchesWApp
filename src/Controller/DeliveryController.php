@@ -22,12 +22,20 @@ class DeliveryController extends AbstractController
         ]);
     }
 
-    #[Route('/delivery/{orderNumber}', name: 'delivery')]
+    #[Route('/delivery/GET/order:{orderNumber}', name: 'delivery')]
     public function delivery(string $orderNumber): JsonResponse
     {
         $order = $this->deliveryService->getOrder($orderNumber);
         return new JsonResponse($order);
     }
+
+    #[Route('/delivery/GET/products', name: 'delivery_products')]
+    public function deliveryProducts(): JsonResponse
+    {
+        $products = $this->deliveryService->getProducts();
+        return new JsonResponse($products['body']);
+    }
+
 
     #[Route('/delivery/test/{test}', name: 'delivery_status')]
     public function deliveryStatus(string $test): Response

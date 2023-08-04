@@ -131,13 +131,12 @@ class ContapymeService
         }
     }
 
-    public function getProducts(string $keyagent): JsonResponse
+    public function getProducts(string $keyagent, string $cant): JsonResponse
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatElemInv/"GetListaElemInv"/';
         $this->arrParams[0] = [
             'datospagina' => [
-                'cantidadregistros' => "5",
-                'pagina' => ''
+                'cantidadregistros' => $cant
             ],
             'camposderetorno' => [
                 'irecurso', 'nrecurso', 'clase2'
