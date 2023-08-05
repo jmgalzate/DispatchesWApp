@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\DeliveryService;
@@ -11,7 +12,7 @@ use App\Service\DeliveryService;
 class DeliveryController extends AbstractController
 {
 
-    public function __construct(private readonly DeliveryService $deliveryService)
+    public function __construct(private readonly DeliveryService $deliveryService, private readonly RequestStack $requestStack)
     {
     }
 
@@ -31,7 +32,7 @@ class DeliveryController extends AbstractController
     }
 
     #[Route('/delivery/GET/products', name: 'delivery_products')]
-    public function deliveryProducts(): JsonResponse
+    public function deliveryProducts(): Response
     {
         $products = $this->deliveryService->getProducts();
 
@@ -45,7 +46,9 @@ class DeliveryController extends AbstractController
             ];
         }
 
-        return new JsonResponse($responseData);
+        $this->requestStack->getSession()->set('products', $responseData);
+
+        return $this->redirectToRoute('homepage');
     }
 
     #[Route('/delivery/test/{test}', name: 'delivery_status')]

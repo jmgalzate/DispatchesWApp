@@ -33,6 +33,7 @@ class SessionController extends AbstractController
         try {
             $logout = $this->contapymeService->logout($this->requestStack->getSession()->get('keyagent'));
             $this->requestStack->getSession()->remove('keyagent');
+            $this->requestStack->getSession()->remove('products');
             $response = 'No Session';
         } catch (\Throwable $th) {
             $response = 'Logout error';

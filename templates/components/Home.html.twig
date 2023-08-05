@@ -17,8 +17,18 @@
     <div class="row align-items-md-stretch" style="padding-left: 2%; padding-right: 2%;">
         <div class="col-md-6">
             <div class="h-100 p-5 text-white bg-dark rounded-3">
-                <h2>Change the background</h2>
-                <p>Swap the background-color utility and add a `.text-*` color utility to mix up the jumbotron look. Then, mix and match with additional component themes and more.</p>
+                <h2>Recursos cargados</h2>
+                {% if app.session.get('products') is not null %}
+                    {% set products = app.session.get('products') %}
+                    <p>Se han cargado {{ products|length }} productos.</p>
+                {% else %}
+                    {% if app.session.get('keyagent') is not null %}
+                        <a href="{{ path('delivery_products') }}" class="btn btn-primary"><i class="bi bi-truck"></i> {{
+                            loadProductsButton
+                            }}</a>
+                    {% endif %}
+                    <p>No se han cargado productos.</p>
+                {% endif %}
             </div>
         </div>
         <div class="col-md-6">
