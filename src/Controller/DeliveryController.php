@@ -14,6 +14,7 @@ class DeliveryController extends AbstractController
     public function __construct(private readonly DeliveryService $deliveryService)
     {
     }
+
     #[Route('/delivery', name: 'home_delivery')]
     public function index(): Response
     {
@@ -33,9 +34,19 @@ class DeliveryController extends AbstractController
     public function deliveryProducts(): JsonResponse
     {
         $products = $this->deliveryService->getProducts();
-        return new JsonResponse($products['body']);
-    }
 
+        $responseData = [];
+        foreach ($products as $product) {
+            $responseData[] = [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'barcode' => $product->getBarcode(),
+                'productcode' => $product->getProductCode(),
+            ];
+        }
+
+        return new JsonResponse($responseData);
+    }
 
     #[Route('/delivery/test/{test}', name: 'delivery_status')]
     public function deliveryStatus(string $test): Response

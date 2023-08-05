@@ -25,6 +25,27 @@ class Product
     #[ORM\Column]
     private ?int $quantity = null;
 
+    public function __construct(
+        int $id,
+        string $name,
+        string $barcode,
+        string $productcode,
+        int $quantity
+    )
+    {
+        $this->id = $id;
+        $this->name = $name;
+        $this->barcode = $barcode;
+        $this->productcode = $productcode;
+        $this->quantity = $quantity;
+    }
+
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
     public function getId(): ?int
     {
         return $this->id;

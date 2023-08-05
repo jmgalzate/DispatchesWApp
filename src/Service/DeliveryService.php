@@ -1,7 +1,9 @@
 <?php
+
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
+use App\Entity\Product;
 
 class DeliveryService
 {
@@ -25,8 +27,35 @@ class DeliveryService
     public function getProducts(): array
     {
         $keyagent = $this->requestStack->getSession()->get('keyagent');
-        $products = $this->contapymeService->getProducts(keyagent: $keyagent, cant: 5);
-        return json_decode($products->getContent(), true);
+        $productsData = $this->contapymeService->getProducts(keyagent: $keyagent, cant: 5);
+
+        $productsData = $productsData->getContent();
+        $productsData = json_decode($productsData, true);
+        $productsData = $productsData['body'];
+
+        $products = []; // Create an empty array to store products
+        $id = 0;
+
+        try {
+            foreach ($productsData as $productData) {
+                // Create a new Product object and add it to the $products array
+                $product = new Product(
+                    id: $id++,
+                    name: $productData['nrecurso'],
+                    barcode: $productData['clase2'],
+                    productcode: $productData['irecurso'],
+                    quantity: 1
+                );
+                $products[] = $product;
+            }
+
+            // Now $products array contains all the Product objects
+            return $products;
+        } catch (\Exception $e) {
+            return [
+                'error' => $e->getMessage()
+            ];
+        }
     }
 
     private function handlingOrder(array $order): array
