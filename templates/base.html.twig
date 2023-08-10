@@ -46,10 +46,13 @@
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
            data-bs-toggle="dropdown" aria-expanded="false">
             {% if app.session.get('keyagent') is not null %}
-                <img src="{{ asset('img/open.jpg') }}" alt="" width="32" height="32" class="rounded-circle me-2">
+                <!--<img src="{{ asset('img/open.jpg') }}" alt="" width="32" height="32" class="rounded-circle me-2">-->
+                <div style="width:32px; height:32px; background-color: lightgreen" class="rounded-circle me-2"></div>
                 {{ app.session.get('keyagent') }}
             {% else %}
-                <img src="{{ asset('img/closed.jpg') }}" alt="" width="32" height="32" class="rounded-circle me-2">
+                <!--<img src="{{ asset('img/closed.jpg') }}" alt="" width="32" height="32" class="rounded-circle
+                me-2">-->
+                <div style="width:32px; height:32px; background-color: darkgray" class="rounded-circle me-2"></div>
                 <strong>No Session</strong>
             {% endif %}
         </a>
