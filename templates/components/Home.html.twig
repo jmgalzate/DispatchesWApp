@@ -8,33 +8,37 @@
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold">{{ title }}</h1>
         </div>
-        {% if app.session.get('keyagent') is not null %}
-            <a href="{{ path('home_delivery') }}" class="btn btn-primary"><i class="bi bi-truck"></i> {{ dispatchButton
-                }}</a>
-        {% endif %}
     </div>
 
     <div class="row align-items-md-stretch" style="padding-left: 2%; padding-right: 2%;">
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="h-100 p-5 text-white bg-dark rounded-3">
                 <h2>Recursos cargados</h2>
+                <button class="btn btn-primary"
+                        onclick="window.location.href = '{{ path('delivery_products') }}'"
+                        {% if app.session.get('keyagent') is null %} disabled {% endif %}>
+                    <i class="bi bi-truck"></i> {{ loadProductsButton }}
+                </button>
+                <br><br>
+                <h4>Estado de la carga:</h4>
                 {% if app.session.get('products') is not null %}
                     {% set products = app.session.get('products') %}
                     <p>Se han cargado {{ products|length }} productos.</p>
                 {% else %}
-                    {% if app.session.get('keyagent') is not null %}
-                        <a href="{{ path('delivery_products') }}" class="btn btn-primary"><i class="bi bi-truck"></i> {{
-                            loadProductsButton
-                            }}</a>
-                    {% endif %}
                     <p>No se han cargado productos.</p>
                 {% endif %}
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-7">
             <div class="h-100 p-5 bg-light border rounded-3">
-                <h2>Add borders</h2>
-                <p>Or, keep it light and add a border for some added definition to the boundaries of your content. Be sure to look under the hood at the source HTML here as we've adjusted the alignment and sizing of both column's content for equal-height.</p>
+                <h2>Despachos Efectuados</h2>
+                <button class="btn btn-primary"
+                        onclick="window.location.href = '{{ path('home_delivery') }}'"
+                        {% if app.session.get('keyagent') is null %} disabled {% endif %}>
+                    <i class="bi bi-truck"></i> {{ dispatchButton }}
+                </button>
+                <br><br>
+                <h4>Despachos de este mes:</h4>
             </div>
         </div>
     </div>
