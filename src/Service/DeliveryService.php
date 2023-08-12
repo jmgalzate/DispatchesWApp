@@ -27,7 +27,7 @@ class DeliveryService
     public function getProducts(): array
     {
         $keyagent = $this->requestStack->getSession()->get('keyagent');
-        $productsData = $this->contapymeService->getProducts(keyagent: $keyagent, cant: 50);
+        $productsData = $this->contapymeService->getProducts(keyagent: $keyagent, cant: $_ENV['API_QPRODUCTS']);
 
         $productsData = $productsData->getContent();
         $productsData = json_decode($productsData, true);
