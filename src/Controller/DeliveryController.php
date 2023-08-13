@@ -24,31 +24,15 @@ class DeliveryController extends AbstractController
         ]);
     }
 
+    /**
+     * @throws \JsonException
+     */
     #[Route('/delivery/GET/order:{orderNumber}', name: 'delivery')]
     public function delivery(string $orderNumber): JsonResponse
     {
         $order = $this->deliveryService->getOrder($orderNumber);
-        return new JsonResponse($order);
-    }
-
-    #[Route('/delivery/GET/products', name: 'delivery_products')]
-    public function deliveryProducts(): Response
-    {
-        $products = $this->deliveryService->getProducts();
-
-        $responseData = [];
-        foreach ($products as $product) {
-            $responseData[] = [
-                'id' => $product->getId(),
-                'name' => $product->getName(),
-                'barcode' => $product->getBarcode(),
-                'productcode' => $product->getProductCode(),
-            ];
-        }
-
-        $this->requestStack->getSession()->set('products', $responseData);
-
-        return $this->redirectToRoute('homepage');
+        $this->requestStack->getSession()->set('actualOrder', $order['body']);
+        return new JsonResponse($order['body']);
     }
 
     #[Route('/delivery/test/{test}', name: 'delivery_status')]
