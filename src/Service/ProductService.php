@@ -61,5 +61,24 @@ class ProductService{
             ];
         }
     }
-}
 
+    public function vlookupProduct(string $barcode): array
+    {
+        $products = $this->requestStack->getSession()->get('products');
+        $product = array_filter($products, function ($product) use ($barcode) {
+            return $product['barcode'] === $barcode;
+        });
+
+        if (count($product) > 0) {
+            $product = array_values($product)[0];
+            return [
+                'success' => 'Producto encontrado',
+                'product' => $product
+            ];
+        } else {
+            return [
+                'error' => 'Producto no encontrado'
+            ];
+        }
+    }
+}
