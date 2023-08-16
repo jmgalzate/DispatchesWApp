@@ -15,7 +15,7 @@
             <div class="h-100 p-5 text-white bg-dark rounded-3">
                 <h2>Recursos cargados</h2>
                 <button class="btn btn-primary"
-                        onclick="window.location.href = '{{ path('homepage_get_products') }}'"
+                        onclick="window.location.href = '{{ path('get_all_products') }}'"
                         {% if app.session.get('keyagent') is null %} disabled {% endif %}>
                     <i class="bi bi-truck"></i> {{ loadProductsButton }}
                 </button>
