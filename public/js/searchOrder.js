@@ -13,3 +13,5 @@ function searchOrder() {
             console.error(error);
         });
 }
+
+//TODO: complete the function for looking for the Order and load it into the page

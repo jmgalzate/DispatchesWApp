@@ -6,6 +6,7 @@ use App\Service\ProductService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ProductController extends AbstractController
@@ -26,11 +27,14 @@ class ProductController extends AbstractController
         return $this->redirectToRoute('homepage', $loadProducts);
     }
 
-    #[Route('/product/GET/barcode:{barcode}', name: 'get_product_by_barcode')]
-    public function getProduct(ProductService $productService, string $barcode): Response
+    #[Route('/product/GET/barcode:{barcode}', name: 'get_product_by_barcode', methods: ['GET'])]
+    public function getProduct(Request $request, ProductService $productService, string $barcode): JsonResponse
     {
-        $loadProduct = $productService->vlookupProduct($barcode);
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse('Recurso no disponible', Response::HTTP_BAD_REQUEST);
+        }
 
-        return $this->redirectToRoute('homepage', $loadProduct);
+        $loadProduct = $productService->vlookupProduct($barcode);
+        return new JsonResponse($loadProduct);
     }
 }
