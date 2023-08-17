@@ -24,7 +24,7 @@ class ProductController extends AbstractController
     {
         $loadProducts = $productService->getProducts();
 
-        return $this->redirectToRoute('homepage', $loadProducts);
+        return $this->redirectToRoute('homepage');
     }
 
     #[Route('/product/GET/barcode:{barcode}', name: 'get_product_by_barcode', methods: ['GET'])]
