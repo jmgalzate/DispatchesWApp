@@ -93,7 +93,7 @@ class ContapymeService
     {
         $endpoint = $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/';
 
-        if ($action == 'SAVE') {
+        if ($action == 'SAVE' || $action == 'CALCULAR IMPUESTOS') {
             $this->arrParams[0] = [
                 'accion' => $action,
                 'operaciones' => [
