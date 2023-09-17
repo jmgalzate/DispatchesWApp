@@ -25,8 +25,22 @@ class Product
     #[ORM\Column]
     private ?int $requestedquantity = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $dispatchedquantity = null;
+    #[ORM\Column]
+    private ?int $dispatchedquantity = null;
+
+    public function __construct(
+        string $name,
+        string $barcode,
+        string $code,
+        int $requestedquantity,
+        int $dispatchedquantity
+    ) {
+        $this->name = $name;
+        $this->barcode = $barcode;
+        $this->code = $code;
+        $this->requestedquantity = $requestedquantity;
+        $this->dispatchedquantity = $dispatchedquantity;
+    }
 
     public function getId(): ?int
     {
@@ -81,12 +95,12 @@ class Product
         return $this;
     }
 
-    public function getDispatchedquantity(): ?string
+    public function getDispatchedquantity(): ?int
     {
         return $this->dispatchedquantity;
     }
 
-    public function setDispatchedquantity(string $dispatchedquantity): static
+    public function setDispatchedquantity(int $dispatchedquantity): static
     {
         $this->dispatchedquantity = $dispatchedquantity;
 
