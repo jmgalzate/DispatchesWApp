@@ -76,6 +76,10 @@ class OrderProduct
     #[ORM\Column(length: 255)]
     private ?string $qrecurso2 = null;
 
+    #[ORM\ManyToOne(inversedBy: 'listaproductos')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Order $orderid = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -329,6 +333,18 @@ class OrderProduct
     public function setQrecurso2(string $qrecurso2): static
     {
         $this->qrecurso2 = $qrecurso2;
+
+        return $this;
+    }
+
+    public function getOrderid(): ?Order
+    {
+        return $this->orderid;
+    }
+
+    public function setOrderid(?Order $orderid): static
+    {
+        $this->orderid = $orderid;
 
         return $this;
     }
