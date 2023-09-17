@@ -29,12 +29,14 @@ class Product
     private ?int $dispatchedquantity = null;
 
     public function __construct(
+        int $id,
         string $name,
         string $barcode,
         string $code,
         int $requestedquantity,
         int $dispatchedquantity
     ) {
+        $this->id = $id;
         $this->name = $name;
         $this->barcode = $barcode;
         $this->code = $code;

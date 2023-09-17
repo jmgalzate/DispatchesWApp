@@ -35,7 +35,8 @@ class ProductService{
                     name: $productData['nrecurso'],
                     barcode: $productData['clase2'],
                     code: $productData['irecurso'],
-                    quantity: 1
+                    requestedquantity: 0,
+                    dispatchedquantity: 0
                 );
                 $products[] = $product;
             }
@@ -46,7 +47,7 @@ class ProductService{
                     'id' => $product->getId(),
                     'name' => $product->getName(),
                     'barcode' => $product->getBarcode(),
-                    'code' => $product->getProductCode(),
+                    'code' => $product->getCode(),
                 ];
             }
 
