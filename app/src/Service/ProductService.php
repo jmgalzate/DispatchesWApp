@@ -30,7 +30,7 @@ class ProductService{
         try {
             foreach ($productsData as $productData) {
                 // Create a new Product object and add it to the $products array
-                $product = new ProductEntity(
+                $product = new Product(
                     id: $this->nextProductId++,
                     name: $productData['nrecurso'],
                     barcode: $productData['clase2'],
