@@ -4,6 +4,7 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use App\Entity\Product;
+use App\Entity\ProductEntity;
 
 class ProductService{
 
@@ -29,11 +30,11 @@ class ProductService{
         try {
             foreach ($productsData as $productData) {
                 // Create a new Product object and add it to the $products array
-                $product = new Product(
+                $product = new ProductEntity(
                     id: $this->nextProductId++,
                     name: $productData['nrecurso'],
                     barcode: $productData['clase2'],
-                    productcode: $productData['irecurso'],
+                    code: $productData['irecurso'],
                     quantity: 1
                 );
                 $products[] = $product;
@@ -45,7 +46,7 @@ class ProductService{
                     'id' => $product->getId(),
                     'name' => $product->getName(),
                     'barcode' => $product->getBarcode(),
-                    'productcode' => $product->getProductCode(),
+                    'code' => $product->getProductCode(),
                 ];
             }
 
