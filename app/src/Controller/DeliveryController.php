@@ -6,8 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\DeliveryService;
+use App\Service\ProductService;
 
 class DeliveryController extends AbstractController
 {
@@ -53,5 +55,16 @@ class DeliveryController extends AbstractController
             </html>
             EOL
         );
+    }
+
+    #[Route('/product/GET/barcode:{barcode}', name: 'get_product_by_barcode', methods: ['GET'])]
+    public function getProduct(Request $request, ProductService $productService, string $barcode): JsonResponse
+    {
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse('Recurso no disponible', Response::HTTP_BAD_REQUEST);
+        }
+
+        $loadProduct = $productService->vlookupProduct($barcode);
+        return new JsonResponse($loadProduct);
     }
 }
