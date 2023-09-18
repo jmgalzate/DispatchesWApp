@@ -56,9 +56,11 @@ class HomeController extends AbstractController
         return $this->redirectToRoute('homepage');
     }
 
-    /**
-     * TODO: 
-     * - [x] Create methods to manage the Sessions
-     * - [ ] Create methods to manage the Products on Session global variables
-     */
+    #[Route('/product/GET/all', name: 'get_all_products')]
+    public function getProducts(ProductService $productService): Response
+    {
+        $loadProducts = $productService->getProducts();
+
+        return $this->redirectToRoute('homepage');
+    }
 }

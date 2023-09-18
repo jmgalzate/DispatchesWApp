@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * TODO: remove this Controller and manage the Sessions from HomeController
+ */
+
 namespace App\Controller;
 
 use App\Service\ProductService;
@@ -17,14 +21,6 @@ class ProductController extends AbstractController
         return new JsonResponse(
             "This is the product page"
         );
-    }
-
-    #[Route('/product/GET/all', name: 'get_all_products')]
-    public function getProducts(ProductService $productService): Response
-    {
-        $loadProducts = $productService->getProducts();
-
-        return $this->redirectToRoute('homepage');
     }
 
     #[Route('/product/GET/barcode:{barcode}', name: 'get_product_by_barcode', methods: ['GET'])]
