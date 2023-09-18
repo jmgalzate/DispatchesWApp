@@ -25,5 +25,9 @@ services:
             - '@http_client' # Assuming the HttpClient service is defined in the container
             - '@logger' # Assuming the LoggerInterface service is defined in the container
 
+    App\Service\ContapymeService:
+            arguments:
+                - '@http_client' # Assuming the HttpClient service is defined in the container
+                - '@logger' # Assuming the LoggerInterface service is defined in the container
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
