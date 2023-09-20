@@ -34,8 +34,17 @@ class Order
     #[ORM\Column(length: 255)]
     private ?string $qoprsok = null;
 
-    public function __construct()
-    {
+    public function __construct(
+        OrderHeader $encabezado,
+        OrderInvoiceSettlement $liquidacion,
+        OrderMainData $datosprincipales,
+        Collection $listaproductos = null,
+        string $qoprsok
+    ) {
+        $this->encabezado = $encabezado;
+        $this->liquidacion = $liquidacion;
+        $this->datosprincipales = $datosprincipales;
+        $this->qoprsok = $qoprsok;
         $this->listaproductos = new ArrayCollection();
     }
 
@@ -52,6 +61,13 @@ class Order
     public function setEncabezado(OrderHeader $encabezado): static
     {
         $this->encabezado = $encabezado;
+
+        return $this;
+    }
+
+    public function setEncabezadoNewUser(string $username): static
+    {
+        $this->encabezado->setIusuarioult($username);
 
         return $this;
     }

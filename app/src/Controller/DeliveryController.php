@@ -10,9 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Service\DeliveryService;
 use App\Service\ProductService;
+use App\Entity\Order;
 
 class DeliveryController extends AbstractController
 {
+
+    public Order $requestedOrder;
+    public Order $dispatchedOrder;
 
     public function __construct(private readonly DeliveryService $deliveryService, private readonly RequestStack $requestStack)
     {
@@ -32,9 +36,35 @@ class DeliveryController extends AbstractController
     #[Route('/delivery/GET/order:{orderNumber}', name: 'delivery')]
     public function delivery(string $orderNumber): JsonResponse
     {
-        $order = $this->deliveryService->getOrder($orderNumber);
-        $this->requestStack->getSession()->set('actualOrder', $order['body']);
-        return new JsonResponse($order['body']);
+        $orderData = $this->deliveryService->loadOrder($orderNumber);
+
+        /**
+         * TODO: the Order is not properly serialized into a JSON Object for showing it in the view.
+         */
+
+        $orderJson = json_encode($orderData, JSON_UNESCAPED_UNICODE);
+        $order = json_decode($orderJson);
+
+        //dump($orderData);
+        $this->requestedOrder = new Order (
+            encabezado: $orderData->getEncabezado(),
+            liquidacion: $orderData->getLiquidacion(),
+            datosprincipales: $orderData->getDatosprincipales(),
+            listaproductos: $orderData->getListaproductos(),
+            qoprsok: $orderData->getQoprsok()
+        );
+
+        // dispatchedOrder configured with the same data as the requested order and with empty liquidation and Products.
+        $this->dispatchedOrder = new Order(
+            encabezado: $orderData->getEncabezado(),
+            liquidacion: $orderData->getLiquidacion(),
+            datosprincipales: $orderData->getDatosprincipales(),
+            listaproductos: null,
+            qoprsok: $orderData->getQoprsok()
+        );
+
+        $this->dispatchedOrder->setEncabezadoNewUser("WEBAPI");
+        return new JsonResponse($order);
     }
 
     #[Route('/delivery/test/{test}', name: 'delivery_status')]
