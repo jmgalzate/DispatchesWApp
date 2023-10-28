@@ -1,4 +1,3 @@
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.dev
@@ -11,7 +10,8 @@
 ###< symfony/framework-bundle ###
 
 ###> config and local files ###
-
+.DS_Store
+.DS_Store/
 /.DS_Store
 /.vscode/
 /Dockerfile
