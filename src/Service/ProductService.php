@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * TODO: remove this Service and manage some methods from HomeController and other by DeliveryController
+ */
+
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;

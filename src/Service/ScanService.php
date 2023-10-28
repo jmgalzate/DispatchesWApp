@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * TODO: remove this Service and manage the Sessions from DeliveryController
+ */
+
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
