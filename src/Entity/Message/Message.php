@@ -1,5 +1,5 @@
 <?php
-namespace App\Entity;
+namespace App\Entity\Message;
 
 use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,11 +14,17 @@ class Message {
     #[ORM\Column(name: 'id', type: 'integer')]
     private ?int $id = null;
     
-    #[ORM\Column(name: 'message_type', type: 'integer')]
+    #[ORM\Column(name: 'messagetype', type: 'integer')]
     private ?int $messageType = null;
 
-    #[ORM\Column(name: 'order_number', type: 'integer')]
+    #[ORM\Column(name: 'ordernumber', type: 'integer')]
     private ?int $orderNumber = null;
+    
+    #[ORM\Column(name: 'endpoint', type: 'string', length: 255)]
+    private ?string $endpoint = null;
+    
+    #[ORM\Column(name: 'HttpStatus', type: 'integer')]
+    private ?int $httpStatus = null;
     
     #[ORM\Column(name: 'payload', type: 'TEXT')]
     private ?string $payload = null;
@@ -26,7 +32,7 @@ class Message {
     #[ORM\Column(name: 'response', type: 'TEXT')]
     private ?string $response = null;
     
-    #[ORM\Column(name: 'created_at', type: 'datetime')]
+    #[ORM\Column(name: 'createdat', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
     
     public function getId(): ?int {
@@ -50,7 +56,25 @@ class Message {
         $this->orderNumber = $orderNumber;
         return $this;
     }
-
+    
+    public function getEndpoint(): ?string {
+        return $this->endpoint;
+    }
+    
+    public function setEndpoint(string $endpoint): self {
+        $this->endpoint = $endpoint;
+        return $this;
+    }
+    
+    public function getHttpStatus(): ?int {
+        return $this->httpStatus;
+    }
+    
+    public function setHttpStatus(int $httpStatus): self {
+        $this->httpStatus = $httpStatus;
+        return $this;
+    }
+    
     public function getPayload(): ?string {
         return $this->payload;
     }
@@ -77,5 +101,4 @@ class Message {
         $this->createdAt = $createdAt;
         return $this;
     }
-    
 }
