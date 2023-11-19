@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\Contapyme\Payload;
+use App\Entity\Message\Payload;
 use App\Service\MessagesService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -70,7 +70,7 @@ class ContapymeController extends AbstractController
         );
 
         return new JsonResponse([
-            'response' => 'Response' //TODO: update this
+            $responseData
         ]);
     }
 

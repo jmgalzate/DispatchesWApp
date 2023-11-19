@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Contapyme\Payload;
+use App\Entity\Message\Payload;
 use App\Entity\Message\Message;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +34,6 @@ class MessagesService
             ]
         ]));
         $this->message->setCreatedAt(new \DateTime());
-
 
         $responseData = $this->sendMessage(
                 endpoint: $endpoint, 

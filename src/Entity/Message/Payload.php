@@ -1,6 +1,6 @@
 <?php 
 
-namespace App\Entity\Contapyme;
+namespace App\Entity\Message;
 
 class Payload {
     private string $parameters;
