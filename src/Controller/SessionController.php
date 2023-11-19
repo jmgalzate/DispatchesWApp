@@ -1,6 +1,7 @@
 <?php
 
-namespace app\Controller;
+namespace App\Controller;
+
 use App\Service\SessionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,17 +14,52 @@ class SessionController extends AbstractController
     ) {
     }
 
+    #[Route('/session', name: 'app_session')]
+    public function index(): Response
+    {
+        return new Response(
+            '<html><body>
+            <h1>Session</h1>
+            <ul>
+                <li><a href="/session/login">Login</a></li>
+                <li><a href="/session/logout">Logout</a></li>
+            </ul>
+        </body></html>'
+        );
+    }
+
     #[Route('/session/login', name: 'app_session_login')]
     public function login(): Response
     {
-        $this->sessionService->startSession();
-        return $this->redirectToRoute('homepage');
+        $response = $this->sessionService->startSession();
+        $responseData = json_decode($response->getContent(), true);
+
+        if ($responseData['Code'] === 500) {
+            return new Response(
+                '<html><body>
+                <script>
+                    alert("Session error");
+                    window.location.href = "/session";
+                </script>
+            </body></html>'
+            );
+        }
+
+        return $this->redirect('/session',200);
     }
 
     #[Route('/session/logout', name: 'app_session_logout')]
     public function logout(): Response
     {
         $this->sessionService->closeSession();
-        return $this->redirectToRoute('homepage');
+
+        return new Response(
+            '<html><body>
+            <script>
+                alert("Session closed");
+                window.location.href = "/session";
+            </script>
+        </body></html>'
+        );
     }
 }
