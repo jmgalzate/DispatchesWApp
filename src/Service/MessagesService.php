@@ -49,13 +49,14 @@ class MessagesService
                 ]
             );
 
-        $this->message->setResponse(json_encode($responseData));
+        $this->message->setResponse(json_encode($responseData['Response']));
 
         $messageId = $this->saveMessage();
 
         return [
-            'Status' => 'Success',
-            'MessageId' => $messageId
+            'MessageId' => $messageId,
+            'Status' => $responseData['Status'],
+            'Response' => $responseData['Response']
         ];
     }
 
@@ -68,77 +69,42 @@ class MessagesService
 
             $this->message->setHttpStatus($response->getStatusCode());
 
-            $this->logger->recordLog(
-                logType: 2,
-                logDetails: [
-                    'Endpoint' => $this->message->getEndpoint(),
-                    'HttpStatusCode' => $this->message->getHttpStatus(),
-                    'Message' => 'Message sent successfully'
-                ]
-            );
+            return [
+                'Status' => 'Success',
+                'Response' => $response->toArray()
+            ];
 
         } catch (ServerException $e) {
             $this->message->setHttpStatus($e->getCode());
             $this->message->setResponse($e->getMessage());
 
-            $this->logger->recordLog(
-                logType: 0,
-                logDetails: [
-                    'Endpoint' => $this->message->getEndpoint(),
-                    'HttpStatusCode' => $this->message->getHttpStatus(),
-                    'Message' => $e->getMessage()
-                ]
-            );
-
             return [
-                'Endpoint' => $this->message->getEndpoint(),
-                'HttpStatusCode' => $this->message->getHttpStatus(),
-                'Message' => $e->getMessage()
+                'Status' => 'Error',
+                'Response' => $e->getMessage()
             ];
+
         } catch (ClientException $e) {
             $this->message->setHttpStatus($e->getCode());
             $this->message->setResponse($e->getMessage());
 
-            $this->logger->recordLog(
-                logType: 0,
-                logDetails: [
-                    'Endpoint' => $this->message->getEndpoint(),
-                    'HttpStatusCode' => $this->message->getHttpStatus(),
-                    'Message' => $e->getMessage()
-                ]
-            );
-
             return [
-                'Endpoint' => $this->message->getEndpoint(),
-                'HttpStatusCode' => $this->message->getHttpStatus(),
-                'Message' => $e->getMessage()
+                'Status' => 'Error',
+                'Response' => $e->getMessage()
             ];
+
         } catch (\Exception $e) {
             $this->message->setHttpStatus($e->getCode());
             $this->message->setResponse($e->getMessage());
 
-            $this->logger->recordLog(
-                logType: 0,
-                logDetails: [
-                    'Endpoint' => $this->message->getEndpoint(),
-                    'HttpStatusCode' => $this->message->getHttpStatus(),
-                    'Message' => $e->getMessage()
-                ]
-            );
-
             return [
-                'Endpoint' => $this->message->getEndpoint(),
-                'HttpStatusCode' => $this->message->getHttpStatus(),
-                'Message' => $e->getMessage()
+                'Status' => 'Error',
+                'Response' => $e->getMessage()
             ];
         }
-
         // $responseData = $response->toArray();
         // $header = $responseData["result"][0]["encabezado"];
         // $statusCode = $response->getStatusCode();
         // $body = $responseData["result"][0]["respuesta"]["datos"];
-
-        return $response->toArray();
     }
 
     private function validateResponse(): void
