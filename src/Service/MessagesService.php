@@ -15,7 +15,7 @@ class MessagesService
     private Message $message;
     
     public function __construct(
-        private readonly HttpClientInterface $client,
+        private readonly HttpClientInterface $httpClient,
         private readonly EntityManagerInterface $entityManager,
         private readonly LogService $logger
     )
@@ -63,7 +63,7 @@ class MessagesService
     private function sendMessage(string $endpoint, array $payload): array
     {
         try {
-            $response = $this->client->request('POST', $endpoint, [
+            $response = $this->httpClient->request('POST', $endpoint, [
                 'json' => ['_parameters' => $payload]
             ]);
 
@@ -101,14 +101,6 @@ class MessagesService
                 'Response' => $e->getMessage()
             ];
         }
-        // $responseData = $response->toArray();
-        // $header = $responseData["result"][0]["encabezado"];
-        // $statusCode = $response->getStatusCode();
-        // $body = $responseData["result"][0]["respuesta"]["datos"];
-    }
-
-    private function validateResponse(): void
-    {
     }
 
     private function saveMessage(): int
