@@ -13,7 +13,7 @@ class Log
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'id', type: 'integer')]
-    private ?int $id = null;
+    private ?int $id;
 
     //0. Error, 1. Warning, 2. Info
     #[ORM\Column(name: 'logType', type: 'integer')]

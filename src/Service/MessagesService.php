@@ -4,8 +4,11 @@ namespace App\Service;
 
 use App\Entity\Message\Payload;
 use App\Entity\Message\Message;
+use App\Service\LogService;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpClient\Exception\ClientException;
+use Symfony\Component\HttpClient\Exception\ServerException;
 
 class MessagesService
 {
@@ -13,7 +16,8 @@ class MessagesService
     
     public function __construct(
         private readonly HttpClientInterface $client,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly LogService $logger
     )
     {
     }
@@ -57,11 +61,77 @@ class MessagesService
 
     private function sendMessage(string $endpoint, array $payload): array
     {
-        $response = $this->client->request('POST', $endpoint, [
-            'json' => ['_parameters' => $payload]
-        ]);
+        try {
+            $response = $this->client->request('POST', $endpoint, [
+                'json' => ['_parameters' => $payload]
+            ]);
 
-        $this->message->setHttpStatus($response->getStatusCode());
+            $this->message->setHttpStatus($response->getStatusCode());
+
+            $this->logger->recordLog(
+                logType: 2,
+                logDetails: [
+                    'Endpoint' => $this->message->getEndpoint(),
+                    'HttpStatusCode' => $this->message->getHttpStatus(),
+                    'Message' => 'Message sent successfully'
+                ]
+            );
+
+        } catch (ServerException $e) {
+            $this->message->setHttpStatus($e->getCode());
+            $this->message->setResponse($e->getMessage());
+
+            $this->logger->recordLog(
+                logType: 0,
+                logDetails: [
+                    'Endpoint' => $this->message->getEndpoint(),
+                    'HttpStatusCode' => $this->message->getHttpStatus(),
+                    'Message' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'Endpoint' => $this->message->getEndpoint(),
+                'HttpStatusCode' => $this->message->getHttpStatus(),
+                'Message' => $e->getMessage()
+            ];
+        } catch (ClientException $e) {
+            $this->message->setHttpStatus($e->getCode());
+            $this->message->setResponse($e->getMessage());
+
+            $this->logger->recordLog(
+                logType: 0,
+                logDetails: [
+                    'Endpoint' => $this->message->getEndpoint(),
+                    'HttpStatusCode' => $this->message->getHttpStatus(),
+                    'Message' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'Endpoint' => $this->message->getEndpoint(),
+                'HttpStatusCode' => $this->message->getHttpStatus(),
+                'Message' => $e->getMessage()
+            ];
+        } catch (\Exception $e) {
+            $this->message->setHttpStatus($e->getCode());
+            $this->message->setResponse($e->getMessage());
+
+            $this->logger->recordLog(
+                logType: 0,
+                logDetails: [
+                    'Endpoint' => $this->message->getEndpoint(),
+                    'HttpStatusCode' => $this->message->getHttpStatus(),
+                    'Message' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'Endpoint' => $this->message->getEndpoint(),
+                'HttpStatusCode' => $this->message->getHttpStatus(),
+                'Message' => $e->getMessage()
+            ];
+        }
 
         // $responseData = $response->toArray();
         // $header = $responseData["result"][0]["encabezado"];
