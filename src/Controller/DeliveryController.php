@@ -2,15 +2,15 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\Contapyme\Order;
 use App\Service\DeliveryService;
 use App\Service\ProductService;
-use App\Entity\Order;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class DeliveryController extends AbstractController
 {
@@ -63,7 +63,6 @@ class DeliveryController extends AbstractController
             qoprsok: $orderData->getQoprsok()
         );
 
-        $this->dispatchedOrder->setEncabezadoNewUser("WEBAPI");
         return new JsonResponse($order);
     }
 

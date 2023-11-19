@@ -138,4 +138,18 @@ class ContapymeService
             'response' => 'Response' //TODO: update this
         ]);
     }
+
+    private function validateResponse(): void
+    {
+
+        /**
+         * TODO: Validate if the message was accepted by Contapyme.
+         */
+
+        // $responseData = $response->toArray();
+        // $header = $responseData["result"][0]["encabezado"];
+        // $statusCode = $response->getStatusCode();
+        // $body = $responseData["result"][0]["respuesta"]["datos"];
+
+    }
 }
