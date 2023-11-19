@@ -33,20 +33,12 @@ class ContapymeService
     ];
 
     public function __construct(
-        private readonly MessagesService $messagesService
-    )
-    {
+        private readonly MessagesService $messagesService,
+        private readonly LogService $logService
+    ){
         $this->messagePayload = new Payload();
         $this->messagePayload->setIapp();
         $this->messagePayload->setRandom();
-    }
-
-    public function index(): JsonResponse {
-
-        return new JsonResponse([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ContapymeController.php',
-        ]);
     }
 
     public function getAuth(): JsonResponse
@@ -66,7 +58,9 @@ class ContapymeService
         );
 
         return new JsonResponse([
-            $responseData
+            'MessageId' => $responseData['MessageId'],
+            'Status' => $responseData['Status'],
+            'Response' => $responseData['Response']
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Service\ContapymeService;
+use App\Service\LogService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,7 +12,8 @@ class ContapymeController extends AbstractController
 {
 
     public function __construct(
-        private readonly ContapymeService $contapymeService
+        private readonly ContapymeService $contapymeService,
+        private readonly LogService $logService
     )
     {
     }
@@ -21,15 +23,18 @@ class ContapymeController extends AbstractController
 
         return new JsonResponse([
             'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ContapymeController.php',
+            'path' => 'src/Controller/ContapymeController.php'
         ]);
     }
 
     #[Route('/contapyme/auth', name: 'contapyme_auth')]
     public function getAuth(): JsonResponse
     {
+        $response = $this->contapymeService->getAuth();
+        $responseData = $response->getContent();
+        
         return new JsonResponse([
-            'response' => 'Response' //TODO: update this
+            'Authentication Response' => json_decode($responseData, true)
         ]);
     }
 
@@ -38,7 +43,7 @@ class ContapymeController extends AbstractController
     {
 
         return new JsonResponse([
-            'response' => 'Response' //TODO: update this
+            'Logout Response' => $this->contapymeService->logout($keyagent)
         ]);
     }
 
@@ -46,7 +51,7 @@ class ContapymeController extends AbstractController
     public function action(int $actionid, int $order, string $keyagent, array $newOrder = []): JsonResponse
     {
         return new JsonResponse([
-            'response' => 'Response' //TODO: update this
+            'Action Response' => $this->contapymeService->action($actionid, $order, $keyagent, $newOrder)
         ]);
     }
 
@@ -55,7 +60,7 @@ class ContapymeController extends AbstractController
     {
 
         return new JsonResponse([
-            'response' => 'Response' //TODO: update this
+            'Products Response' => $this->contapymeService->products($keyagent)
         ]);
     }
 }
