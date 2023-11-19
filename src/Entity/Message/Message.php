@@ -52,7 +52,7 @@ class Message {
         return $this->orderNumber;
     }
 
-    public function setOrderNumber(int $orderNumber): self {
+    public function setOrderNumber(int $orderNumber = null): self {
         $this->orderNumber = $orderNumber;
         return $this;
     }
