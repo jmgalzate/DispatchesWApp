@@ -13,13 +13,13 @@ class LogService
     {
     }
 
-    public function recordLog(int $logType, string $logDetails): int
+    public function recordLog(int $logType, array $logDetails): int
     {
             $log = new Log();
 
             $log->setCreatedAt(new \DateTime());
             $log->setLogType($logType);
-            $log->setLogDetails($logDetails);
+            $log->setLogDetails(json_encode($logDetails));
 
             $this->entityManager->persist($log);
             $this->entityManager->flush();
