@@ -19,7 +19,7 @@ class Log
     #[ORM\Column(name: 'logType', type: 'integer')]
     private ?int $logType = null;
 
-    #[ORM\Column(name: 'logDetails', type: 'TEXT')]
+    #[ORM\Column(name: 'logDetails', type: 'text')]
     private ?string $logDetails = null;
 
     #[ORM\Column(name: 'createdAt', type: 'datetime')]

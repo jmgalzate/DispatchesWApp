@@ -26,10 +26,10 @@ class Message {
     #[ORM\Column(name: 'HttpStatus', type: 'integer')]
     private ?int $httpStatus = null;
     
-    #[ORM\Column(name: 'payload', type: 'TEXT')]
+    #[ORM\Column(name: 'payload', type: 'text')]
     private ?string $payload = null;
     
-    #[ORM\Column(name: 'response', type: 'TEXT')]
+    #[ORM\Column(name: 'response', type: 'text')]
     private ?string $response = null;
     
     #[ORM\Column(name: 'createdat', type: 'datetime')]
