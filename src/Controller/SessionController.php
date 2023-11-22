@@ -52,12 +52,25 @@ class SessionController extends AbstractController
     #[Route('/session/logout', name: 'app_session_logout')]
     public function logout(): Response
     {
-        $this->sessionService->closeSession();
+        $response = $this->sessionService->closeSession();
+        $responseData = json_decode($response->getContent(), true);
+
+        if ($responseData['Code'] !== 200) {
+            $message = "Session error: " . str_replace('"', '\"', $responseData['Status']);
+            return new Response(
+                '<html><body>
+                <script>
+                    alert("' . $message . '");
+                    window.location.href = "/session";
+                </script>
+            </body></html>'
+            );
+        }
 
         return new Response(
             '<html><body>
             <script>
-                alert("Session closed");
+                alert("'.$responseData['Status'].'");
                 window.location.href = "/session";
             </script>
         </body></html>'

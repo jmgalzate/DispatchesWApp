@@ -23,9 +23,6 @@ class SessionService
             $this->requestStack->getSession()->set('keyagent', $response['Response']['keyagent']);
             $this->status = 'Session started';
             $this->code = 200;
-        } elseif ($response['Code'] === 500) {
-            $this->status = 'Error';
-            $this->code = 500;
         } else {
             $this->status = 'Error: ' . $response['Response'];
             $this->code = $response['Code'];
@@ -37,15 +34,25 @@ class SessionService
         ]);
     }
 
-    public function closeSession(): void
+    public function closeSession(): JsonResponse
     {
-        try {
-            $logout = $this->contapymeService->logout($this->requestStack->getSession()->get('keyagent'));
-        } catch (\Throwable $th) {
-            $this->logger->error($th->getMessage());
-        }
+        $logout = $this->contapymeService->logout($this->requestStack->getSession()->get('keyagent'));
+        $logoutData = json_decode($logout->getContent(), true);
 
         $this->requestStack->getSession()->remove('keyagent');
         $this->requestStack->getSession()->remove('products');
+
+        if ($logoutData['Code'] === 200) {
+            $this->status = 'Session closed';
+            $this->code = 200;
+        } else {
+            $this->status = "Session closed, but consider check: \n" . $logoutData['Response'];
+            $this->code = $logoutData['Code'];
+        }
+
+        return new JsonResponse([
+            'Status' => "Session closed. \n".$this->status,
+            'Code' => $this->code
+        ]);
     }
 }
