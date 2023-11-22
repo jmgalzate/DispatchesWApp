@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Service;
 
@@ -6,7 +6,7 @@ use App\Entity\Message\Payload;
 use App\Service\MessagesService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ContapymeService 
+class ContapymeService
 {
     private Payload $messagePayload;
     private array $actions = [
@@ -35,7 +35,7 @@ class ContapymeService
     public function __construct(
         private readonly MessagesService $messagesService,
         private readonly LogService $logService
-    ){
+    ) {
         $this->messagePayload = new Payload();
         $this->messagePayload->setIapp();
         $this->messagePayload->setRandom();
@@ -51,55 +51,39 @@ class ContapymeService
         ]);
 
         $responseData = $this->messagesService->processRequest(
-            messageType:1, 
-            orderNumber: null, 
-            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/', 
+            messageType: 1,
+            orderNumber: null,
+            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/',
             payload: $this->messagePayload
         );
 
-        if($responseData['Status'] === 'Success') {
-
-            $validateResponse = $this->validateResponse($responseData['Response']);
-
-            if($validateResponse['Status'] === 'Success') {
-                return new JsonResponse([
-                    'Status' => $validateResponse['Status'],
-                    'Code' => $validateResponse['Code'],
-                    'Response' => [
-                        'keyagent' => $validateResponse['Response']['datos']['keyagente'],
-                    ]
-                ]);
-
-            } else {
-                return new JsonResponse([
-                    'Status' => 'Error',
-                    'Code' => $validateResponse['Code'],
-                    'Response' => $validateResponse['Response']
-                ]);
-            }
-        } else {
-            return new JsonResponse([
-                'Status' => 'Error',
-                'Code' => $responseData['Code'],
-                'Response' => $responseData['Response']
-            ]);
-        }
+        $validatedResponse = $this->validateResponse($responseData['Response']);
+        
+        return new JsonResponse([
+            'Status' => $validatedResponse['Status'],
+            'Code' => $validatedResponse['Code'],
+            'Response' => $validatedResponse['Response']
+        ]);
     }
 
     public function logout(string $keyagent): JsonResponse
     {
         $this->messagePayload->setAgent($keyagent);
         $this->messagePayload->setParameters([]);
-        
+
         $responseData = $this->messagesService->processRequest(
-            messageType:8, 
-            orderNumber: null, 
-            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"Logout"/', 
+            messageType: 8,
+            orderNumber: null,
+            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"Logout"/',
             payload: $this->messagePayload
         );
 
+        $validatedResponse = $this->validateResponse($responseData['Response']);
+
         return new JsonResponse([
-            'response' => 'Response' //TODO: update this
+            'Status' => $validatedResponse['Status'],
+            'Code' => $validatedResponse['Code'],
+            'Response' => $validatedResponse['Response']
         ]);
     }
 
@@ -115,7 +99,7 @@ class ContapymeService
             ]
         ];
 
-        if(in_array($actionid, [4, 5])) {
+        if (in_array($actionid, [4, 5])) {
             $parameters['oprdata'] = $newOrder;
         }
 
@@ -123,9 +107,9 @@ class ContapymeService
         $this->messagePayload->setParameters($parameters);
 
         $responseData = $this->messagesService->processRequest(
-            messageType: $this->actions[$actionid]['messageType'], 
-            orderNumber: $order, 
-            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/', 
+            messageType: $this->actions[$actionid]['messageType'],
+            orderNumber: $order,
+            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/',
             payload: $this->messagePayload
         );
 
@@ -150,9 +134,9 @@ class ContapymeService
         ]);
 
         $responseData = $this->messagesService->processRequest(
-            messageType: 7, 
-            orderNumber: null, 
-            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatProductos/"GetAllProducts"/', 
+            messageType: 7,
+            orderNumber: null,
+            endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatProductos/"GetAllProducts"/',
             payload: $this->messagePayload
         );
 
@@ -165,23 +149,53 @@ class ContapymeService
      * This validateReponse function is created for confirming if the message was accepted, because the API returns the error code in the body and it is not configured for HTTP status codes.
      */
 
-    private function validateResponse(array $response): array
-    {
-        $header = $response['result'][0]['encabezado'];
-        $body = $response['result'][0]['respuesta'];
+     private function validateResponse(array $responseData): array
+     {
+         if ($responseData['Status'] === 'Success') {
+             $response = $responseData['Response'];
 
-        if($header['resultado'] === "true") {
-            return [
-                'Status' => 'Success',
-                'Code' => 200, //The value is set as default due to the API doesn't return a code when the message is accepted. 
-                'Response' => $body
-            ];
-        } else {
-            return [
-                'Status' => 'Error',
-                'Code' => intval($header['imensaje']),
-                'Response' => $header['mensaje']
-            ];
-        }
-    }
+             $validateResponse = function ($response) {
+                 $header = $response['result'][0]['encabezado'];
+                 $body = $response['result'][0]['respuesta'];
+     
+                 if ($header['resultado'] === "true") {
+                     return [
+                         'Status' => 'Success',
+                         'Code' => 200, //The value is set as default due to the API doesn't return a code when the message is accepted. 
+                         'Response' => $body
+                     ];
+                 } else {
+                     return [
+                         'Status' => 'Error',
+                         'Code' => intval($header['imensaje']),
+                         'Response' => $header['mensaje']
+                     ];
+                 }
+             };
+     
+             $validatedResponse = $validateResponse($response);
+     
+             if ($validatedResponse['Status'] === 'Success') {
+                 return [
+                     'Status' => $validatedResponse['Status'],
+                     'Code' => $validatedResponse['Code'],
+                     'Response' => [
+                         'keyagent' => $validatedResponse['Response']['datos']['keyagente'],
+                     ]
+                 ];
+             } else {
+                 return [
+                     'Status' => 'Error',
+                     'Code' => $validatedResponse['Code'],
+                     'Response' => $validatedResponse['Response']
+                 ];
+             }
+         } else {
+             return [
+                 'Status' => 'Error',
+                 'Code' => $responseData['Code'],
+                 'Response' => $responseData['Response']
+             ];
+         }
+     }
 }
