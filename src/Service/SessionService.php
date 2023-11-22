@@ -51,7 +51,7 @@ class SessionService
         }
 
         return new JsonResponse([
-            'Status' => "Session closed. \n".$this->status,
+            'Status' => "Session closed: ".$this->status,
             'Code' => $this->code
         ]);
     }
