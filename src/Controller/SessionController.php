@@ -46,7 +46,7 @@ class SessionController extends AbstractController
             );
         }
 
-        return $this->redirect('/session', 200);
+        return $this->redirect('/session');
     }
 
     #[Route('/session/logout', name: 'app_session_logout')]

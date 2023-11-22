@@ -20,7 +20,7 @@ class SessionService
         $response = json_decode($response->getContent(), true);
 
         if ($response['Code'] === 200) {
-            $this->requestStack->getSession()->set('keyagent', $response['Response']['keyagent']);
+            $this->requestStack->getSession()->set('keyagent', $response['Response']['keyagente']);
             $this->status = 'Session started';
             $this->code = 200;
         } else {

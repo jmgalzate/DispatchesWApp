@@ -57,7 +57,7 @@ class ContapymeService
             payload: $this->messagePayload
         );
 
-        $validatedResponse = $this->validateResponse($responseData['Response']);
+        $validatedResponse = $this->validateResponse($responseData);
         
         return new JsonResponse([
             'Status' => $validatedResponse['Status'],
@@ -78,7 +78,7 @@ class ContapymeService
             payload: $this->messagePayload
         );
 
-        $validatedResponse = $this->validateResponse($responseData['Response']);
+        $validatedResponse = $this->validateResponse($responseData);
 
         return new JsonResponse([
             'Status' => $validatedResponse['Status'],
@@ -179,9 +179,7 @@ class ContapymeService
                  return [
                      'Status' => $validatedResponse['Status'],
                      'Code' => $validatedResponse['Code'],
-                     'Response' => [
-                         'keyagent' => $validatedResponse['Response']['datos']['keyagente'],
-                     ]
+                     'Response' => $validatedResponse['Response']['datos']
                  ];
              } else {
                  return [
