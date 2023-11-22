@@ -57,11 +57,33 @@ class ContapymeService
             payload: $this->messagePayload
         );
 
-        return new JsonResponse([
-            'MessageId' => $responseData['MessageId'],
-            'Status' => $responseData['Status'],
-            'Response' => $responseData['Response']
-        ]);
+        if($responseData['Status'] === 'Success') {
+
+            $validateResponse = $this->validateResponse($responseData['Response']);
+
+            if($validateResponse['Status'] === 'Success') {
+                return new JsonResponse([
+                    'Status' => $validateResponse['Status'],
+                    'Code' => $validateResponse['Code'],
+                    'Response' => [
+                        'keyagent' => $validateResponse['Response']['datos']['keyagente'],
+                    ]
+                ]);
+
+            } else {
+                return new JsonResponse([
+                    'Status' => 'Error',
+                    'Code' => $validateResponse['Code'],
+                    'Response' => $validateResponse['Response']
+                ]);
+            }
+        } else {
+            return new JsonResponse([
+                'Status' => 'Error',
+                'Code' => $responseData['Code'],
+                'Response' => $responseData['Response']
+            ]);
+        }
     }
 
     public function logout(string $keyagent): JsonResponse
@@ -139,17 +161,27 @@ class ContapymeService
         ]);
     }
 
-    private function validateResponse(): void
+    /**
+     * This validateReponse function is created for confirming if the message was accepted, because the API returns the error code in the body and it is not configured for HTTP status codes.
+     */
+
+    private function validateResponse(array $response): array
     {
+        $header = $response['result'][0]['encabezado'];
+        $body = $response['result'][0]['respuesta'];
 
-        /**
-         * TODO: Validate if the message was accepted by Contapyme.
-         */
-
-        // $responseData = $response->toArray();
-        // $header = $responseData["result"][0]["encabezado"];
-        // $statusCode = $response->getStatusCode();
-        // $body = $responseData["result"][0]["respuesta"]["datos"];
-
+        if($header['resultado'] === "true") {
+            return [
+                'Status' => 'Success',
+                'Code' => 200, //The value is set as default due to the API doesn't return a code when the message is accepted. 
+                'Response' => $body
+            ];
+        } else {
+            return [
+                'Status' => 'Error',
+                'Code' => intval($header['imensaje']),
+                'Response' => $header['mensaje']
+            ];
+        }
     }
 }

@@ -16,17 +16,19 @@ class SessionService
 
     public function startSession(): JsonResponse
     {
-        try {
-            $response = $this->contapymeService->getAuth();
-            $response = json_decode($response->getContent(), true);
-            $this->requestStack->getSession()->set('keyagent', $response['keyagent']);
-            $this->status = 'Success';
+        $response = $this->contapymeService->getAuth();
+        $response = json_decode($response->getContent(), true);
+
+        if ($response['Code'] === 200) {
+            $this->requestStack->getSession()->set('keyagent', $response['Response']['keyagent']);
+            $this->status = 'Session started';
             $this->code = 200;
-        } catch (\Throwable $th) {
-            //$this->requestStack->getSession()->set('keyagent', 'Login error');
-            $this->logger->error($th->getMessage());
+        } elseif ($response['Code'] === 500) {
             $this->status = 'Error';
             $this->code = 500;
+        } else {
+            $this->status = 'Error: ' . $response['Response'];
+            $this->code = $response['Code'];
         }
 
         return new JsonResponse([

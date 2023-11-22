@@ -34,18 +34,19 @@ class SessionController extends AbstractController
         $response = $this->sessionService->startSession();
         $responseData = json_decode($response->getContent(), true);
 
-        if ($responseData['Code'] === 500) {
+        if ($responseData['Code'] !== 200) {
+            $message = "Session error: " . str_replace('"', '\"', $responseData['Status']);
             return new Response(
                 '<html><body>
                 <script>
-                    alert("Session error");
+                    alert("' . $message . '");
                     window.location.href = "/session";
                 </script>
             </body></html>'
             );
         }
 
-        return $this->redirect('/session',200);
+        return $this->redirect('/session', 200);
     }
 
     #[Route('/session/logout', name: 'app_session_logout')]
