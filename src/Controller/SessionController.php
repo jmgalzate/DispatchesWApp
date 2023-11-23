@@ -35,7 +35,7 @@ class SessionController extends AbstractController
         $responseData = json_decode($response->getContent(), true);
 
         if ($responseData['Code'] !== 200) {
-            $message = "Session error: " . str_replace('"', '\"', $responseData['Status']);
+            $message = str_replace('"', '\"', $responseData['Status']);
             return new Response(
                 '<html><body>
                 <script>
