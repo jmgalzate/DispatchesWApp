@@ -13,33 +13,33 @@ class Product
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: 'name', length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: 'barcode',length: 255)]
     private ?string $barcode = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(name: 'code', length: 255)]
     private ?string $code = null;
 
-    #[ORM\Column]
-    private ?int $requestedquantity = null;
+    #[ORM\Column(name: "requestedQuantity", type: "integer")]
+    private ?int $requestedQuantity = null;
 
-    #[ORM\Column]
-    private ?int $dispatchedquantity = null;
+    #[ORM\Column (name: 'dispatchedQuantity', type: 'integer')]
+    private ?int $dispatchedQuantity = null;
 
     public function __construct (
-        string $name,
-        string $barcode,
-        string $code,
-        int    $requestedquantity,
-        int    $dispatchedquantity
+        string  $name,
+        string  $barcode,
+        string  $code,
+        int     $requestedQuantity,
+        int     $dispatchedQuantity
     ) {
         $this->name = $name;
         $this->barcode = $barcode;
         $this->code = $code;
-        $this->requestedquantity = $requestedquantity;
-        $this->dispatchedquantity = $dispatchedquantity;
+        $this->requestedQuantity = $requestedQuantity;
+        $this->dispatchedQuantity = $dispatchedQuantity;
     }
 
     public function getId (): ?int {
@@ -60,7 +60,7 @@ class Product
         return $this->barcode;
     }
 
-    public function setBarcode (string $barcode): static {
+    public function setBarcode (string $barcode): self {
         $this->barcode = $barcode;
 
         return $this;
@@ -70,28 +70,28 @@ class Product
         return $this->code;
     }
 
-    public function setCode (string $code): static {
+    public function setCode (string $code): self {
         $this->code = $code;
 
         return $this;
     }
 
-    public function getRequestedquantity (): ?int {
-        return $this->requestedquantity;
+    public function getRequestedQuantity (): ?int {
+        return $this->requestedQuantity;
     }
 
-    public function setRequestedquantity (int $requestedquantity): static {
-        $this->requestedquantity = $requestedquantity;
+    public function setRequestedQuantity (int $requestedQuantity): self {
+        $this->requestedQuantity = $requestedQuantity;
 
         return $this;
     }
 
-    public function getDispatchedquantity (): ?int {
-        return $this->dispatchedquantity;
+    public function getDispatchedQuantity (): ?int {
+        return $this->dispatchedQuantity;
     }
 
-    public function setDispatchedquantity (int $dispatchedquantity): static {
-        $this->dispatchedquantity = $dispatchedquantity;
+    public function setDispatchedQuantity (int $dispatchedQuantity): self {
+        $this->dispatchedQuantity = $dispatchedQuantity;
 
         return $this;
     }

@@ -125,6 +125,13 @@ class ContapymeService
         ]);
     }
 
+    /**
+     * TODO: 
+     * Total products to download are > 17K and the iteration for inserting all of them in the database create an issue with the Memory configuration for PHP.
+     *
+     * Bearing in mind this, the best option is to download the Products on demand: each time a new order is downloaded, the program will download the products information and will insert or update the information in the local database.
+     */
+
     public function getProducts (string $keyAgent): JsonResponse {
 
         $this->messagePayload->setAgent($keyAgent);

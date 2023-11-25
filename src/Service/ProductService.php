@@ -31,8 +31,8 @@ class ProductService
                 name: $productData['nrecurso'],
                 barcode: $productData['clase2'],
                 code: $productData['irecurso'],
-                requestedquantity: 0,
-                dispatchedquantity: 0,
+                requestedQuantity: 0,
+                dispatchedQuantity: 0,
             );
 
             $this->saveProduct($product);
