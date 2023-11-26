@@ -51,6 +51,10 @@ readonly class ProductService
     public function findProductByCode (string $code): Product | null {
         return $this->entityManager->getRepository(Product::class)->findOneBy(['code' => $code]);
     }
+    
+    public function totalProductsInDB (): int {
+        return $this->entityManager->getRepository(Product::class)->totalProductsInDB();
+    }
 
     private function saveProduct(Product $product): void {
         $existingProduct = $this->findProductByCode($product->getCode());
