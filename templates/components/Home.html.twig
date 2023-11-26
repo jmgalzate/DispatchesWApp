@@ -14,19 +14,7 @@
         <div class="col-md-5">
             <div class="h-100 p-5 text-white bg-dark rounded-3">
                 <h2>Recursos cargados</h2>
-                <button class="btn btn-primary"
-                        onclick="window.location.href = '{{ path('get_all_products') }}'"
-                        {% if app.session.get('keyagent') is null %} disabled {% endif %}>
-                    <i class="bi bi-truck"></i> {{ loadProductsButton }}
-                </button>
-                <br><br>
-                <h4>Estado de la carga:</h4>
-                {% if app.session.get('products') is not null %}
-                    {% set products = app.session.get('products') %}
-                    <p>Se han cargado {{ products|length }} productos.</p>
-                {% else %}
-                    <p>No se han cargado productos.</p>
-                {% endif %}
+                <p>Productos registrados en la base de datos local: </p>
             </div>
         </div>
         <div class="col-md-7">
