@@ -125,25 +125,64 @@ class ContapymeService
         ]);
     }
 
-    /**
-     * TODO: 
-     * Total products to download are > 17K and the iteration for inserting all of them in the database create an issue with the Memory configuration for PHP.
-     *
-     * Bearing in mind this, the best option is to download the Products on demand: each time a new order is downloaded, the program will download the products information and will insert or update the information in the local database.
-     */
+    /*    
+    
+        The getAllProducts() is commented because the API returns a lot of products. When inserted the products in the DB
+     the PHP memory limit exceeded. The solution: to get the products On Demand. The getRequestedProducts() function.
+    
+        public function getAllProducts (string $keyAgent): JsonResponse {
+    
+            $this->messagePayload->setAgent($keyAgent);
+            $this->messagePayload->setParameters([
+                "datospagina" => [
+                    "cantidadregistros" => $_ENV['API_QPRODUCTS'],
+                    "pagina" => ""
+                ],
+                "camposderetorno" => [
+                    "irecurso",
+                    "nrecurso",
+                    "clase2"
+                ]
+            ]);
+    
+            $responseData = $this->messagesService->processRequest(
+                messageType: 7,
+                orderNumber: 0,
+                endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatElemInv/"GetListaElemInv"/',
+                payload: $this->messagePayload
+            );
+    
+            $validatedResponse = $this->validateResponse($responseData);
+    
+            return new JsonResponse([
+                'Status' => $validatedResponse['Status'],
+                'Code' => $validatedResponse['Code'],
+                'Response' => $validatedResponse['Response']
+            ]);
+        }*/
 
-    public function getProducts (string $keyAgent): JsonResponse {
+    public function getRequestedProducts (string $keyAgent, array $products): JsonResponse {
+
+
+        $quotedProducts = array_map(function ($product) {
+            return "'$product'";
+        }, $products);
 
         $this->messagePayload->setAgent($keyAgent);
         $this->messagePayload->setParameters([
             "datospagina" => [
-                "cantidadregistros" => $_ENV['API_QPRODUCTS'],
-                "pagina" => ""
+                "cantidadregistros" => $_ENV['API_QPRODUCTS']
             ],
             "camposderetorno" => [
                 "irecurso",
                 "nrecurso",
                 "clase2"
+            ],
+            "datosfiltro" => [
+                "sql" => "clase2 is not null and clase2 <> '' and irecurso in (" . implode(',', $quotedProducts) . ")"
+            ],
+            "ordernarpor" => [
+                "clase2" => "asc"
             ]
         ]);
 
@@ -194,19 +233,12 @@ class ContapymeService
 
             $validatedResponse = $validateResponse($response); //Calling the anonymous function
 
-            if ($validatedResponse['Status'] === 'Success') {
-                return [
-                    'Status' => $validatedResponse['Status'],
-                    'Code' => $validatedResponse['Code'],
-                    'Response' => $validatedResponse['Response']['datos']
-                ];
-            } else {
-                return [
-                    'Status' => 'Error',
-                    'Code' => $validatedResponse['Code'],
-                    'Response' => $validatedResponse['Response']
-                ];
-            }
+            return [
+                'Status' => $validatedResponse['Status'],
+                'Code' => $validatedResponse['Code'],
+                'Response' => $validatedResponse['Response']['datos'] ?? $validatedResponse['Response']
+            ];
+
         } else {
             return [
                 'Status' => 'Error',

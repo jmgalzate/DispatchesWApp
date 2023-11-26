@@ -6,21 +6,24 @@ use App\Entity\Product;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 
-class ProductService
+readonly class ProductService
 {
     public function __construct (
-        private readonly ContapymeService       $contapymeService,
-        private readonly RequestStack           $requestStack,
-        private readonly EntityManagerInterface $entityManager,
+        private ContapymeService       $contapymeService,
+        private RequestStack           $requestStack,
+        private EntityManagerInterface $entityManager,
     ) {
     }
+    
+    //TODO: implement this method from Controller
 
-    public function getProducts (string $keyAgent = null): int {
+    public function getProducts (string $keyAgent = null, array $products): int {
 
         $agent = $this->requestStack->getSession()->get('keyAgent') ?? $keyAgent;
 
-        $response = $this->contapymeService->getProducts(
-            keyAgent: $agent
+        $response = $this->contapymeService->getRequestedProducts(
+            keyAgent: $agent,
+            products: $products
         );
 
         $responseData = json_decode($response->getContent(), true);
@@ -30,32 +33,37 @@ class ProductService
             $product = new Product(
                 name: $productData['nrecurso'],
                 barcode: $productData['clase2'],
-                code: $productData['irecurso'],
-                requestedQuantity: 0,
-                dispatchedQuantity: 0,
+                code: $productData['irecurso']
             );
 
             $this->saveProduct($product);
             unset($product); // Free up memory
             $productCount++;
         }
-
         unset($responseData); // Free up memory
-
         return $productCount;
     }
 
-    public function findProductByBarcode (string $barcode) {
+    public function findProductByBarcode (string $barcode): Product | null {
         return $this->entityManager->getRepository(Product::class)->findOneBy(['barcode' => $barcode]);
     }
 
-    public function findProductByCode (string $code) {
+    public function findProductByCode (string $code): Product | null {
         return $this->entityManager->getRepository(Product::class)->findOneBy(['code' => $code]);
     }
 
-    private function saveProduct (Product $product): void {
-        $this->entityManager->persist($product);
+    private function saveProduct(Product $product): void {
+        $existingProduct = $this->findProductByCode($product->getCode());
+
+        if ($existingProduct) {
+            // Update existing product
+            $existingProduct->setName($product->getName());
+            $existingProduct->setBarcode($product->getBarcode());
+        } else {
+            // Insert new product
+            $this->entityManager->persist($product);
+        }
+
         $this->entityManager->flush();
     }
-
 }
