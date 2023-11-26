@@ -40,13 +40,13 @@ class SessionController extends AbstractController
                 '<html><body>
                 <script>
                     alert("' . $message . '");
-                    window.location.href = "/session";
+                    window.location.href = "/";
                 </script>
             </body></html>'
             );
         }
 
-        return $this->redirect('/session');
+        return $this->redirect('/');
     }
 
     #[Route('/session/logout', name: 'app_session_logout')]
@@ -61,7 +61,7 @@ class SessionController extends AbstractController
                 '<html><body>
                 <script>
                     alert("' . $message . '");
-                    window.location.href = "/session";
+                    window.location.href = "/";
                 </script>
             </body></html>'
             );
@@ -71,7 +71,7 @@ class SessionController extends AbstractController
             '<html><body>
             <script>
                 alert("'.$responseData['Status'].'");
-                window.location.href = "/session";
+                window.location.href = "/";
             </script>
         </body></html>'
         );

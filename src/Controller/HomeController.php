@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Service\ProductService;
-use App\Service\SessionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +10,6 @@ class HomeController extends AbstractController
 {
 
     public function __construct(
-        private readonly SessionService $sessionService
     ) {
     }
 

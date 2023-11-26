@@ -3,14 +3,13 @@
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SessionService
 {
     private string $status;
     private int $code;
-    public function __construct(private readonly RequestStack $requestStack, private readonly ContapymeService $contapymeService, private readonly LoggerInterface $logger)
+    public function __construct(private readonly RequestStack $requestStack, private readonly ContapymeService $contapymeService)
     {
     }
 
