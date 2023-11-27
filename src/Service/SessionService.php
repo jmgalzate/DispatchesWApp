@@ -5,7 +5,7 @@ namespace App\Service;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class SessionService
+readonly class SessionService
 {
     private string $status;
     private int $code;
