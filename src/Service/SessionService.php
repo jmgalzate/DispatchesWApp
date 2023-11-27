@@ -33,7 +33,7 @@ class SessionService
     }
 
     public function closeSession (): JsonResponse {
-        $logout = $this->contapymeService->logout($this->requestStack->getSession()->get('keyAgent'));
+        $logout = $this->contapymeService->logout();
         $logoutData = json_decode($logout->getContent(), true);
 
         $this->requestStack->getSession()->remove('keyAgent');

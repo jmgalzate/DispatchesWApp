@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Message\Payload;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ContapymeService
 {
@@ -37,6 +38,7 @@ class ContapymeService
      */
     public function __construct (
         private readonly MessagesService $messagesService,
+        private readonly RequestStack $requestStack
     ) {
         $this->messagePayload = new Payload();
         $this->messagePayload->setIapp();
@@ -67,8 +69,8 @@ class ContapymeService
         ]);
     }
 
-    public function logout (string $keyAgent): JsonResponse {
-        $this->messagePayload->setAgent($keyAgent);
+    public function logout (): JsonResponse {
+        $this->messagePayload->setAgent($this->requestStack->getSession()->get('keyAgent'));
         $this->messagePayload->setParameters([]);
 
         $responseData = $this->messagesService->processRequest(
@@ -87,7 +89,7 @@ class ContapymeService
         ]);
     }
 
-    public function action (int $actionId, int $orderNumber, string $keyAgent, array $newOrder = []): JsonResponse {
+    public function action (int $actionId, int $orderNumber, array $newOrder = []): JsonResponse {
         $parameters = [
             'accion' => $this->actions[$actionId]['name'],
             'operaciones' => [
@@ -106,7 +108,7 @@ class ContapymeService
             $parameters['oprdata'] = $newOrder;
         }
 
-        $this->messagePayload->setAgent($keyAgent);
+        $this->messagePayload->setAgent($this->requestStack->getSession()->get('keyAgent'));
         $this->messagePayload->setParameters($parameters);
 
         $responseData = $this->messagesService->processRequest(
@@ -161,14 +163,14 @@ class ContapymeService
             ]);
         }*/
 
-    public function getRequestedProducts (string $keyAgent, array $products): JsonResponse {
+    public function getRequestedProducts (array $products): JsonResponse {
 
 
         $quotedProducts = array_map(function ($product) {
             return "'$product'";
         }, $products);
 
-        $this->messagePayload->setAgent($keyAgent);
+        $this->messagePayload->setAgent($this->requestStack->getSession()->get('keyAgent'));
         $this->messagePayload->setParameters([
             "datospagina" => [
                 "cantidadregistros" => $_ENV['API_QPRODUCTS']

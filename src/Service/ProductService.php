@@ -3,26 +3,21 @@
 namespace App\Service;
 
 use App\Entity\Product;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class ProductService
 {
     public function __construct (
         private ContapymeService       $contapymeService,
-        private RequestStack           $requestStack,
         private EntityManagerInterface $entityManager,
     ) {
     }
     
     //TODO: implement this method from Controller
 
-    public function getProducts (string $keyAgent = null, array $products): int {
-
-        $agent = $this->requestStack->getSession()->get('keyAgent') ?? $keyAgent;
+    public function getProducts (array $products): int {
 
         $response = $this->contapymeService->getRequestedProducts(
-            keyAgent: $agent,
             products: $products
         );
 
