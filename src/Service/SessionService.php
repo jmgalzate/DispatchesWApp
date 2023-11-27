@@ -9,17 +9,16 @@ class SessionService
 {
     private string $status;
     private int $code;
-    public function __construct(private readonly RequestStack $requestStack, private readonly ContapymeService $contapymeService)
-    {
+
+    public function __construct (private readonly RequestStack $requestStack, private readonly ContapymeService $contapymeService) {
     }
 
-    public function startSession(): JsonResponse
-    {
+    public function startSession (): JsonResponse {
         $response = $this->contapymeService->getAuth();
         $response = json_decode($response->getContent(), true);
 
         if ($response['Code'] === 200) {
-            $this->requestStack->getSession()->set('keyAgent', $response['Response']['keyAgente']);
+            $this->requestStack->getSession()->set('keyAgent', $response['Response']['keyagente']);
             $this->status = 'Session started';
             $this->code = 200;
         } else {
@@ -33,8 +32,7 @@ class SessionService
         ]);
     }
 
-    public function closeSession(): JsonResponse
-    {
+    public function closeSession (): JsonResponse {
         $logout = $this->contapymeService->logout($this->requestStack->getSession()->get('keyAgent'));
         $logoutData = json_decode($logout->getContent(), true);
 
