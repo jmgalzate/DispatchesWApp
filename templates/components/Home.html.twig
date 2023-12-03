@@ -8,25 +8,45 @@
         <div class="container-fluid py-5">
             <h1 class="display-5 fw-bold">{{ title }}</h1>
         </div>
+        <div class="container-fluid py-3">
+            <button class="btn btn-primary"
+                    onclick="window.location.href = '{{ path('home_delivery') }}'"
+                    {% if app.session.get('keyagent') is null %} disabled title="You need to be logged in to access this feature" {% endif %}>
+                <i class="bi bi-truck"></i> {{ dispatchButton }}
+            </button>
+        </div>
     </div>
 
     <div class="row align-items-md-stretch" style="padding-left: 2%; padding-right: 2%;">
         <div class="col-md-5">
             <div class="h-100 p-5 text-white bg-dark rounded-3">
                 <h2>Recursos cargados</h2>
-                <p>Productos registrados en la base de datos local: </p>
+                <ul>
+                    <li>
+                        La base de datos tiene {{ totalProducts }} productos guardados
+                    </li>
+                    <li>
+                        La última orden despachada fue la {"No de Orden"}
+                    </li>
+                </ul>
+
             </div>
         </div>
         <div class="col-md-7">
             <div class="h-100 p-5 bg-light border rounded-3">
-                <h2>Despachos Efectuados</h2>
-                <button class="btn btn-primary"
-                        onclick="window.location.href = '{{ path('home_delivery') }}'"
-                        {% if app.session.get('keyagent') is null %} disabled {% endif %}>
-                    <i class="bi bi-truck"></i> {{ dispatchButton }}
-                </button>
-                <br><br>
-                <h4>Despachos de este mes:</h4>
+                <h2>Despachos</h2>
+
+                <h4>Este mes:</h4>
+                <ul>
+                    <li>Se han efectuado {n} despachos</li>
+                    <li>La eficiencia de los despachos efectuados está en {x}</li>
+                </ul>
+
+                <h4>Hoy:</h4>
+                <ul>
+                    <li>Se han efectuado {n} despachos</li>
+                    <li>La eficiencia de los despachos efectuados está en {x}</li>
+                </ul>
             </div>
         </div>
     </div>
