@@ -11,7 +11,8 @@
         <div class="container-fluid py-3">
             <button class="btn btn-primary"
                     onclick="window.location.href = '{{ path('home_delivery') }}'"
-                    {% if app.session.get('keyagent') is null %} disabled title="You need to be logged in to access this feature" {% endif %}>
+                    {% if app.session.get('keyAgent') is null %} disabled title="You need to be logged in to access 
+                    this feature" {% endif %}>
                 <i class="bi bi-truck"></i> {{ dispatchButton }}
             </button>
         </div>
