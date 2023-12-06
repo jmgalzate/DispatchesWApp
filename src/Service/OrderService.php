@@ -12,6 +12,11 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 readonly class OrderService
 {
+    /**
+     * TODO: 
+     * 1. Manage exceptions for each step, for example when the order doesn't exist.
+     * 2. If the response is that the agent is not connected, then try to connect and try again.
+     */
     public function __construct (
         private ContapymeService $contapymeService,
         private RequestStack $requestStack
@@ -38,17 +43,16 @@ readonly class OrderService
             actionId: 3,
             orderNumber: $orderNumber
         );
-
+        
         $responseData = $response->getContent();
         $responseData = json_decode($responseData, true);
 
+        // Deserialize the JSON data into an Order object
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer(null, null, null , new ReflectionExtractor())];
-
         $serializer = new Serializer($normalizers, $encoders);
-
-        // Deserialize the JSON data into an Order object
         $order = $serializer->deserialize(json_encode($responseData['Response']), Order::class, 'json');
+        // End of deserialization
         
         $this->requestStack->getSession()->set('order', $order);
         

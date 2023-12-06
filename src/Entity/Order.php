@@ -6,7 +6,6 @@ use App\Entity\Order\MainData;
 use App\Entity\Order\Header;
 use App\Entity\Order\Settlement;
 
-
 class Order
 {
     private ?Header $encabezado;
