@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Despachos{% endblock %}
+
+{% block body %}
+
+    <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5">
+            <h1 class="display-5 fw-bold">{{ title }}</h1>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-4">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Ingresa el No. de la Orden"
+                           aria-label="Ingresa el No. de la Orden" aria-describedby="button-addon2">
+                    <button class="btn btn-outline-secondary" type="button" id="button-addon2"
+                            onclick="window.location.href = '{{ path('order') }}'">Cargar Orden</button>
+                </div>    
+            </div>
+        </div>
+    </div>
+{% endblock %}
