@@ -51,7 +51,7 @@ class Product
      */
     public ?string  $iinventario;
     /**
-     @SerializedName("qrecurso")
+     * @SerializedName("qrecurso")
      */
     public ?int     $qrecurso;
     /**

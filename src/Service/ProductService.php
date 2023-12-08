@@ -4,26 +4,90 @@ namespace App\Service;
 
 use App\Entity\Product;
 use Doctrine\ORM\EntityManagerInterface;
+use JetBrains\PhpStorm\NoReturn;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 readonly class ProductService
 {
     public function __construct (
         private ContapymeService       $contapymeService,
         private EntityManagerInterface $entityManager,
+        private RequestStack $requestStack
     ) {
     }
-    
-    //TODO: implement this method from Controller
 
-    public function getProducts (array $products): int {
+    #[NoReturn] public function setProductsLists (array $productsList): void {
+        $products = [];
 
+        /** Get products, and validate if repeated products for establish the quantities. */
+        foreach ($productsList as $productData) {
+            if (empty($products)) {
+                $products[] = [
+                    'code' => $productData['irecurso'],
+                    'quantity' => $productData['qrecurso']
+                ];
+            } else {
+                foreach ($products as $product) {
+                    if ($product['code'] === $productData['irecurso']) {
+                        $product['quantity'] += $productData['qrecurso'];
+                    } else {
+                        $products[] = [
+                            'code' => $productData['irecurso'],
+                            'quantity' => $productData['qrecurso']
+                        ];
+                    }
+                }
+            }
+        }
+
+        /** Get products codes for request to Contapyme */
+        $productCodes = [];
+        foreach ($products as $productData) {
+            $productCodes[] = $productData['code'];
+        }
+
+        $productsRecorded = $this->getContapymeProducts($productCodes);
+
+        /** Set products to dispatch and record it as a cookie */
+        $productsToDispatch = [];
+        
+        $id = 0;
+        foreach ($productsRecorded as $product) {
+            $productsToDispatch[] = new \App\Entity\Delivery\Product(
+                name: $product->getName(),
+                barcode: $product->getBarcode(),
+                code: $product->getCode(),
+                requestedQuantity: 0,
+                deliveredQuantity: 0
+            );
+        }
+
+        foreach ($products as $productData) {
+            foreach ($productsToDispatch as $product) {
+                if ($product->getCode() === $productData['code']) {
+                    $product->setRequestedQuantity($productData['quantity']);
+                }
+            }
+        }
+        
+        $this->requestStack->getSession()->set('productsToDispatch', $productsToDispatch);  
+        
+    }
+
+    /**
+     * It requires products list passed as an array of strings.
+     * Example for calling the method: getContapymeProducts(products: ['irecurso1', 'irecurso2', 'irecurso3'])
+     */
+
+    private function getContapymeProducts (array $productsToSearch): array {
+
+        $products = [];
         $response = $this->contapymeService->getRequestedProducts(
-            products: $products
+            products: $productsToSearch
         );
 
         $responseData = json_decode($response->getContent(), true);
 
-        $productCount = 0;
         foreach ($responseData['Response'] as $productData) {
             $product = new Product(
                 name: $productData['nrecurso'],
@@ -31,27 +95,28 @@ readonly class ProductService
                 code: $productData['irecurso']
             );
 
+            $products[] = $product;
+
             $this->saveProduct($product);
             unset($product); // Free up memory
-            $productCount++;
         }
         unset($responseData); // Free up memory
-        return $productCount;
+        return $products;
     }
 
-    public function findProductByBarcode (string $barcode): Product | null {
+    public function findProductByBarcode (string $barcode): Product|null {
         return $this->entityManager->getRepository(Product::class)->findOneBy(['barcode' => $barcode]);
     }
 
-    public function findProductByCode (string $code): Product | null {
+    public function findProductByCode (string $code): Product|null {
         return $this->entityManager->getRepository(Product::class)->findOneBy(['code' => $code]);
     }
-    
+
     public function totalProductsInDB (): int {
         return $this->entityManager->getRepository(Product::class)->totalProductsInDB();
     }
 
-    private function saveProduct(Product $product): void {
+    private function saveProduct (Product $product): void {
         $existingProduct = $this->findProductByCode($product->getCode());
 
         if ($existingProduct) {
@@ -65,4 +130,5 @@ readonly class ProductService
 
         $this->entityManager->flush();
     }
+
 }

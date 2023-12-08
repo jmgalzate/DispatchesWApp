@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\DeliveryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Delivery\Product;
 
 class Delivery
 {
@@ -14,9 +15,6 @@ class Delivery
 
     #[ORM\Column(name: 'orderNumber', type: 'integer')]
     private ?int $orderNumber = null;
-    
-    #[ORM\Column(name: 'customerName', type: 'string', length: 255)]
-    private ?string $customerName = null;
     
     #[ORM\Column(name: 'customerId', type: 'bigint')]
     private ?int $customerId = null;
@@ -33,8 +31,11 @@ class Delivery
     #[ORM\Column(name: 'efficiency', type: 'decimal', precision: 1, scale: 4)]
     private ?float $efficiency = null;
     
-    #[ORM\Column(name: 'productsList', type: 'text')]
-    private ?string $productsList = null;
+    #[ORM\Column(name: 'productsList', type: 'json')]
+    /**
+     * @var array<Product>
+     */
+    private ?array $productsList = null;
     
     public function getId (): ?int {
         return $this->id;
@@ -46,16 +47,6 @@ class Delivery
     
     public function setOrderNumber (int $orderNumber): self {
         $this->orderNumber = $orderNumber;
-        
-        return $this;
-    }
-    
-    public function getCustomerName (): ?string {
-        return $this->customerName;
-    }
-    
-    public function setCustomerName (string $customerName): self {
-        $this->customerName = $customerName;
         
         return $this;
     }
@@ -109,12 +100,15 @@ class Delivery
         
         return $this;
     }
-    
-    public function getProductsList (): ?string {
+
+    /**
+     * @return array<Product>
+     */
+    public function getProductsList (): ?array {
         return $this->productsList;
     }
     
-    public function setProductsList (string $productsList): self {
+    public function setProductsList (array $productsList): self {
         $this->productsList = $productsList;
         
         return $this;

@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Entity\Order;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Serializer;
@@ -19,7 +19,8 @@ readonly class OrderService
      */
     public function __construct (
         private ContapymeService $contapymeService,
-        private RequestStack $requestStack
+        private RequestStack $requestStack,
+        private ProductService $productService
     ) {}
     
     public function process(string $orderNumber): JsonResponse {
@@ -47,12 +48,16 @@ readonly class OrderService
         $responseData = $response->getContent();
         $responseData = json_decode($responseData, true);
 
-        // Deserialize the JSON data into an Order object
+        // Deserializing data into an App\Entity\Order object.
         $encoders = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer(null, null, null , new ReflectionExtractor())];
         $serializer = new Serializer($normalizers, $encoders);
         $order = $serializer->deserialize(json_encode($responseData['Response']), Order::class, 'json');
         // End of deserialization
+        
+        $this->productService->setProductsLists($order->getListaproductos());
+        
+        //TODO: set the Delivery object in the session after set the products
         
         $this->requestStack->getSession()->set('order', $order);
         
