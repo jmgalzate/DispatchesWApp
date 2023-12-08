@@ -15,10 +15,10 @@
             <div class="col-4">
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" placeholder="Ingresa el No. de la Orden"
-                           aria-label="Ingresa el No. de la Orden" aria-describedby="button-addon2">
+                           aria-label="Ingresa el No. de la Orden" aria-describedby="button-addon2" id="orderNumber">
                     <button class="btn btn-outline-secondary" type="button" id="button-addon2"
-                            onclick="window.location.href = '{{ path('order') }}'">Cargar Orden</button>
-                </div>    
+                            onclick="window.location.href = '{{ path('delivery_order', {'orderNumber': 'orderNumberPlaceholder'}) }}'.replace('orderNumberPlaceholder', document.getElementById('orderNumber').value)">Cargar Orden</button>
+                </div>   
             </div>
         </div>
     </div>
