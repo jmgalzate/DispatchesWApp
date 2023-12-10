@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Order;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -12,11 +13,6 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 readonly class OrderService
 {
-    /**
-     * TODO: 
-     * 1. Manage exceptions for each step, for example when the order doesn't exist.
-     * 2. If the response is that the agent is not connected, then try to connect and try again.
-     */
     public function __construct (
         private ContapymeService $contapymeService,
         private RequestStack $requestStack,
@@ -29,13 +25,8 @@ readonly class OrderService
             actionId: 1,
             orderNumber: $orderNumber
         );
-        
-        $responseData = $response->getContent();
-        
-        return new JsonResponse([
-            'message' => 'Order processed successfully!',
-            'data' => $responseData
-        ]);
+
+        return new JsonResponse([], $response->getStatusCode());
     }
     
     public function load(string $orderNumber): JsonResponse {
@@ -57,43 +48,29 @@ readonly class OrderService
         
         $this->productService->setProductsLists($order->getListaproductos());
         
-        //TODO: set the Delivery object in the session after set the products
-        
-        $this->requestStack->getSession()->set('order', $order);
-        
-        return new JsonResponse([
-            'message' => 'Order loaded successfully!',
-        ]);
+        return new JsonResponse([], $response->getStatusCode());
     }
     
     public function save(string $orderNumber, array $newOrderData): JsonResponse {
+        
         $response = $this->contapymeService->action(
             actionId: 4,
             orderNumber: $orderNumber,
             newOrder: $newOrderData
         );
 
-        $responseData = $response->getContent();
-
-        return new JsonResponse([
-            'message' => 'Order saved successfully!',
-            'data' => $responseData
-        ]);
+        return new JsonResponse([], $response->getStatusCode());
     }
     
     public function taxes(string $orderNumber, array $newOrderData): JsonResponse {
+        
         $response = $this->contapymeService->action(
             actionId: 5,
             orderNumber: $orderNumber, 
             newOrder: $newOrderData
         );
 
-        $responseData = $response->getContent();
-
-        return new JsonResponse([
-            'message' => 'Taxes calculated successfully!',
-            'data' => $responseData
-        ]);
+        return new JsonResponse([], $response->getStatusCode());
     }
     
     public function unprocess(string $orderNumber): JsonResponse {
@@ -102,21 +79,15 @@ readonly class OrderService
             orderNumber: $orderNumber
         );
 
-        $responseData = $response->getContent();
-
-        return new JsonResponse([
-            'message' => 'Order unprocessed successfully!',
-            'data' => $responseData
-        ]);
+        return new JsonResponse([], $response->getStatusCode());
     }
     
     public function close(): JsonResponse {
 
         $this->requestStack->getSession()->remove('order');
         $this->requestStack->getSession()->remove('dispatch');
+        $this->requestStack->getSession()->remove('productsToDispatch');
 
-        return new JsonResponse([
-            'message' => 'Order closed successfully!'
-        ]);
+        return new JsonResponse([], Response::HTTP_OK);
     }
 }
