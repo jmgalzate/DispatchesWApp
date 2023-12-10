@@ -29,7 +29,7 @@
                         La base de datos tiene {{ totalProducts }} productos guardados
                     </li>
                     <li>
-                        La última orden despachada fue la {"No de Orden"}
+                        La última orden despachada fue la {{ lastDeliveryRecorded }}
                     </li>
                 </ul>
 
@@ -41,14 +41,14 @@
 
                 <h4>Este mes:</h4>
                 <ul>
-                    <li>Se han efectuado {n} despachos</li>
-                    <li>La eficiencia de los despachos efectuados está en {x}</li>
+                    <li>Se han efectuado {{ totalDispatchesThisMonth }} despachos</li>
+                    <li>La eficiencia de los despachos efectuados está en {{ avgEfficiencyThisMonth }}</li>
                 </ul>
 
                 <h4>Hoy:</h4>
                 <ul>
-                    <li>Se han efectuado {n} despachos</li>
-                    <li>La eficiencia de los despachos efectuados está en {x}</li>
+                    <li>Se han efectuado {{ totalDispatchesToday }} despachos</li>
+                    <li>La eficiencia de los despachos efectuados está en {{ avgEfficiencyToday }}</li>
                 </ul>
             </div>
         </div>

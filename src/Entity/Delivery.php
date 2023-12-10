@@ -4,7 +4,9 @@ namespace App\Entity;
 
 use App\Repository\DeliveryRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Delivery\Product;
+
+#[ORM\Entity(repositoryClass: DeliveryRepository::class)]
+#[ORM\Table(name: 'delivery')]
 
 class Delivery
 {
@@ -33,7 +35,7 @@ class Delivery
     
     #[ORM\Column(name: 'productsList', type: 'json')]
     /**
-     * @var array<Product>
+     * @var array<App\Entity\Delivery\Product>
      */
     private ?array $productsList = null;
     
@@ -102,7 +104,7 @@ class Delivery
     }
 
     /**
-     * @return array<Product>
+     * @return array<App\Entity\Delivery\Product>
      */
     public function getProductsList (): ?array {
         return $this->productsList;
