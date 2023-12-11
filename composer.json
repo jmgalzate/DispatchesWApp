@@ -25,6 +25,7 @@
         "symfony/serializer": "6.3.*",
         "symfony/twig-bundle": "6.3.*",
         "symfony/ux-twig-component": "*",
+        "symfony/webpack-encore-bundle": "^2.1",
         "symfony/yaml": "6.3.*",
         "twbs/bootstrap": "5.0.2"
     },
