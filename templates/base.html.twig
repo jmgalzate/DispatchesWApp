@@ -35,20 +35,25 @@
                 Inicio
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{{ path('help') }}"
+               class="nav-link text-white {{ app.request.attributes.get('_route') == 'help' ?
+               'active' }} " aria-current="page">
+                <i class="bi bi-info-square-fill"></i>
+                Ayuda
+            </a>
+        </li>
     </ul>
     <hr>
 
-    {# Session buttons for Login and Logout #}
+    {# Start: Session buttons for Login and Logout #}
     <div class="dropdown">
         <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
            data-bs-toggle="dropdown" aria-expanded="false">
             {% if app.session.get('keyAgent') is not null %}
-                <!--<img src="{{ asset('img/open.jpg') }}" alt="" width="32" height="32" class="rounded-circle me-2">-->
                 <div style="width:32px; height:32px; background-color: lightgreen" class="rounded-circle me-2"></div>
                 {{ app.session.get('keyAgent') }}
             {% else %}
-                <!--<img src="{{ asset('img/closed.jpg') }}" alt="" width="32" height="32" class="rounded-circle
-                me-2">-->
                 <div style="width:32px; height:32px; background-color: darkgray" class="rounded-circle me-2"></div>
                 <strong>No Session</strong>
             {% endif %}
@@ -64,6 +69,8 @@
             </ul>
         {% endif %}
     </div>
+    {# End: Session buttons for Login and Logout #}
+    
 </div>
 
 <main style="margin-left: 250px">
