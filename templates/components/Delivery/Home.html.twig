@@ -14,8 +14,12 @@
         <div class="row align-items-center">
             <div class="col-4">
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" placeholder="Ingresa el No. de la Orden"
-                           aria-label="Ingresa el No. de la Orden" aria-describedby="button-addon2" id="orderNumber">
+                    <input type="text" class="form-control" aria-describedby="button-addon2" 
+                           placeholder="Ingresa el No. de la Orden"
+                           aria-label="Ingresa el No. de la Orden"  
+                           id="orderNumber"
+                           pattern="[0-9]+"
+                    >
                     <button class="btn btn-outline-secondary" type="button" id="button-addon2"
                             onclick="window.location.href = '{{ path('delivery_order', {'orderNumber': 'orderNumberPlaceholder'}) }}'.replace('orderNumberPlaceholder', document.getElementById('orderNumber').value)">Cargar Orden</button>
                 </div>   
