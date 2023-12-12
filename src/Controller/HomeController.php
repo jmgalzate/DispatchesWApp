@@ -11,8 +11,6 @@ use App\Service\ProductService;
 
 class HomeController extends AbstractController
 {
-    
-    private $delivery;
 
     public function __construct(
         private readonly ProductService $productService,
@@ -23,17 +21,17 @@ class HomeController extends AbstractController
     #[Route('/', name: 'homepage')]
     public function index(): Response
     {
-        $this->delivery = $this->entityManager->getRepository(Delivery::class);
+        $delivery = $this->entityManager->getRepository(Delivery::class);
         
         return $this->render('components/Home.html.twig', [
             'title' => 'Bienvenid@ al Portal de Despachos',
             'dispatchButton' => 'Nuevo despacho',
             'totalProducts' => $this->productService->totalProductsInDB(),
-            'lastDeliveryRecorded' => $this->delivery->lastDeliveryRecorded(),
-            'totalDispatchesToday' => $this->delivery->totalDispatchesToday(),
-            'totalDispatchesThisMonth' => $this->delivery->totalDispatchesThisMonth(),
-            'avgEfficiencyToday' => $this->delivery->avgEfficiencyToday(),
-            'avgEfficiencyThisMonth' => $this->delivery->avgEfficiencyThisMonth(),
+            'lastDeliveryRecorded' => $delivery->lastDeliveryRecorded(),
+            'totalDispatchesToday' => $delivery->totalDispatchesToday(),
+            'totalDispatchesThisMonth' => $delivery->totalDispatchesThisMonth(),
+            'avgEfficiencyToday' => $delivery->avgEfficiencyToday(),
+            'avgEfficiencyThisMonth' => $delivery->avgEfficiencyThisMonth(),
         ]);
     }
 }
