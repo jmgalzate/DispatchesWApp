@@ -4,7 +4,6 @@ namespace App\Service;
 
 use App\Entity\Message\Payload;
 use App\Entity\Message\Message;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -20,7 +19,7 @@ class MessagesService
     ) {
     }
 
-    public function processRequest (int $messageType, int $orderNumber, string $endpoint, Payload $payload): JsonResponse {
+    public function processRequest (int $messageType, int $orderNumber, string $endpoint, Payload $payload): array {
 
         $this->message = new Message();
 
@@ -48,18 +47,20 @@ class MessagesService
             ]
         );
 
-        $this->message->setHttpStatus($request->getStatusCode());
-        $this->message->setResponse($request->getContent());
+        $this->message->setHttpStatus($request['code']);
+        $this->message->setResponse($request['body']);
         
-        $messageId = $this->saveMessage();
+        
+        /** Recording the Message (Payload and Response) in the database */
+        $this->saveMessage();
 
-        return new JsonResponse([
-            "MessageId" => $messageId,
-            "body" => $request->getContent()
-        ], $request->getStatusCode());
+        return [
+            "code" => $request['code'],
+            "body" => $request['body']
+        ];
     }
     
-    private function sendMessage (string $endpoint, array $payload): JsonResponse {
+    private function sendMessage (string $endpoint, array $payload): array {
 
         try{
             $request = $this->httpClient->request(
@@ -82,10 +83,10 @@ class MessagesService
             ];
         }
 
-        return new JsonResponse(["body" => $response['body']], $response['code']);
+        return $response;
     }
 
-    private function saveMessage (): int {
+    private function saveMessage (): void {
         $message = new Message();
         $message->setMessageType($this->message->getMessageType());
         $message->setOrderNumber($this->message->getOrderNumber());
@@ -97,8 +98,6 @@ class MessagesService
 
         $this->entityManager->persist($message);
         $this->entityManager->flush();
-
-        return $message->getId();
     }
 
 } 
