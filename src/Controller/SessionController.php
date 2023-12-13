@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
-use App\Service\SessionService;
+use App\Service\ContapymeService;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -10,70 +12,74 @@ use Symfony\Component\Routing\Annotation\Route;
 class SessionController extends AbstractController
 {
     public function __construct(
-        private readonly SessionService $sessionService
+        private readonly RequestStack $requestStack,
+        private readonly ContapymeService $contapymeService
     ) {
     }
 
-    #[Route('/session', name: 'app_session')]
-    public function index(): Response
+    #[Route('/session/login', name: 'app_session_login', methods: ['GET'])]
+    public function login(): JsonResponse
     {
-        return new Response(
-            '<html><body>
-            <h1>Session</h1>
-            <ul>
-                <li><a href="/session/login">Login</a></li>
-                <li><a href="/session/logout">Logout</a></li>
-            </ul>
-        </body></html>'
-        );
-    }
+        $request = $this->requestStack->getCurrentRequest();
 
-    #[Route('/session/login', name: 'app_session_login')]
-    public function login(): Response
-    {
-        $response = $this->sessionService->startSession();
-        $responseData = json_decode($response->getContent(), true);
-
-        if ($responseData['Code'] !== 200) {
-            $message = str_replace('"', '\"', $responseData['Status']);
-            return new Response(
-                '<html><body>
-                <script>
-                    alert("' . $message . '");
-                    window.location.href = "/";
-                </script>
-            </body></html>'
-            );
+        // Check if the request is an AJAX request
+        if ($request->headers->get('X-Requested-With') !== 'XMLHttpRequest') {
+            return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
-        return $this->redirect('/');
+        $authRequest = $this->contapymeService->activateAgent();
+
+        if($authRequest['code'] === Response::HTTP_OK) {
+            $response = [
+                'message' => 'Agente iniciado correctamente',
+                'code' => Response::HTTP_OK
+            ];
+
+            $this->requestStack->getSession()->set('keyAgent', $authRequest['body']['datos']['keyagente']);
+
+        } else {
+            $response = [
+                'message' => $authRequest['body'],
+                'code' => $authRequest['code']
+            ];
+        }
+
+        $jsonResponse = new JsonResponse($response['message']);
+        $jsonResponse->setStatusCode($response['code']);
+
+        return $jsonResponse;
     }
 
-    #[Route('/session/logout', name: 'app_session_logout')]
+    #[Route('/session/logout', name: 'app_session_logout', methods: ['GET'])]
     public function logout(): Response
     {
-        $response = $this->sessionService->closeSession();
-        $responseData = json_decode($response->getContent(), true);
+        $request = $this->requestStack->getCurrentRequest();
 
-        if ($responseData['Code'] !== 200) {
-            $message = "Session error: " . str_replace('"', '\"', $responseData['Status']);
-            return new Response(
-                '<html><body>
-                <script>
-                    alert("' . $message . '");
-                    window.location.href = "/";
-                </script>
-            </body></html>'
-            );
+        // Check if the request is an AJAX request
+        if ($request->headers->get('X-Requested-With') !== 'XMLHttpRequest') {
+            return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
-        return new Response(
-            '<html><body>
-            <script>
-                alert("'.$responseData['Status'].'");
-                window.location.href = "/";
-            </script>
-        </body></html>'
-        );
+        $logoutRequest = $this->contapymeService->closeAgent();
+
+        if($logoutRequest['code'] === Response::HTTP_OK) {
+            $response = [
+                'message' => 'Agente cerrado correctamente',
+                'code' => Response::HTTP_OK
+            ];
+
+            $this->requestStack->getSession()->remove('keyAgent');
+
+        } else {
+            $response = [
+                'message' => $logoutRequest['body'],
+                'code' => $logoutRequest['code']
+            ];
+        }
+
+        $jsonResponse = new JsonResponse($response['message']);
+        $jsonResponse->setStatusCode($response['code']);
+
+        return $jsonResponse;
     }
 }
