@@ -21,9 +21,8 @@ class SessionController extends AbstractController
     public function login(): JsonResponse
     {
         $request = $this->requestStack->getCurrentRequest();
-
-        // Check if the request is an AJAX request
-        if ($request->headers->get('X-Requested-With') !== 'XMLHttpRequest') {
+        
+        if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
             return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
@@ -55,8 +54,7 @@ class SessionController extends AbstractController
     {
         $request = $this->requestStack->getCurrentRequest();
 
-        // Check if the request is an AJAX request
-        if ($request->headers->get('X-Requested-With') !== 'XMLHttpRequest') {
+        if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
             return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
 
