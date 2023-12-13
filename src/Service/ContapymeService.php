@@ -4,12 +4,13 @@ namespace App\Service;
 
 use App\Entity\Message\Payload;
 use Exception;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class ContapymeService
 {
     private Payload $messagePayload;
+    private string $keyAgent;
     private array $actions = [
         1 => [
             "name" => "PROCESS",
@@ -38,58 +39,54 @@ class ContapymeService
      */
     public function __construct (
         private readonly MessagesService $messagesService,
-        private readonly RequestStack $requestStack
+        private readonly RequestStack    $requestStack
     ) {
         $this->messagePayload = new Payload();
         $this->messagePayload->setIapp();
         $this->messagePayload->setRandom();
+
+        $this->keyAgent = $this->requestStack->getSession()->get('keyAgent') ?? '';
     }
 
-    public function getAuth (): JsonResponse {
+    public function activateAgent (): array {
+
         $this->messagePayload->setAgent('');
+
         $this->messagePayload->setParameters([
             'email' => $_ENV['API_USERNAME'],
             'password' => md5($_ENV['API_PASSWORD']),
             'id_maquina' => $_ENV['API_MACHINE_ID']
         ]);
 
-        $responseData = $this->messagesService->processRequest(
+        $request = $this->messagesService->processRequest(
             messageType: 1,
             orderNumber: 0,
             endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"GetAuth"/',
             payload: $this->messagePayload
         );
 
-        $validatedResponse = $this->validateResponse($responseData);
+        if ($request['code'] === Response::HTTP_INTERNAL_SERVER_ERROR)
+            return $request;
 
-        return new JsonResponse([
-            'Status' => $validatedResponse['Status'],
-            'Code' => $validatedResponse['Code'],
-            'Response' => $validatedResponse['Response']
-        ]);
+        return $this->validateResponse($request['body']);
     }
-
-    public function logout (): JsonResponse {
-        $this->messagePayload->setAgent($this->requestStack->getSession()->get('keyAgent'));
+    public function closeAgent (): array {
+        $this->messagePayload->setAgent($this->keyAgent);
         $this->messagePayload->setParameters([]);
 
-        $responseData = $this->messagesService->processRequest(
+        $request = $this->messagesService->processRequest(
             messageType: 8,
             orderNumber: 0,
             endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TBasicoGeneral/"Logout"/',
             payload: $this->messagePayload
         );
 
-        $validatedResponse = $this->validateResponse($responseData);
+        if ($request['code'] === Response::HTTP_INTERNAL_SERVER_ERROR)
+            return $request;
 
-        return new JsonResponse([
-            'Status' => $validatedResponse['Status'],
-            'Code' => $validatedResponse['Code'],
-            'Response' => $validatedResponse['Response']
-        ]);
+        return $this->validateResponse($request['body']);
     }
-
-    public function action (int $actionId, int $orderNumber, array $newOrder = []): JsonResponse {
+    public function agentAction (int $actionId, int $orderNumber, array $newOrder = []): array {
         $parameters = [
             'accion' => $this->actions[$actionId]['name'],
             'operaciones' => [
@@ -108,69 +105,28 @@ class ContapymeService
             $parameters['oprdata'] = $newOrder;
         }
 
-        $this->messagePayload->setAgent($this->requestStack->getSession()->get('keyAgent'));
+        $this->messagePayload->setAgent($this->keyAgent);
         $this->messagePayload->setParameters($parameters);
 
-        $responseData = $this->messagesService->processRequest(
+        $request = $this->messagesService->processRequest(
             messageType: $this->actions[$actionId]['messageType'],
             orderNumber: $orderNumber,
             endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatOperaciones/"DoExecuteOprAction"/',
             payload: $this->messagePayload
         );
 
-        $validatedResponse = $this->validateResponse($responseData);
+        if ($request['code'] === Response::HTTP_INTERNAL_SERVER_ERROR)
+            return $request;
 
-        return new JsonResponse([
-            'Status' => $validatedResponse['Status'],
-            'Code' => $validatedResponse['Code'],
-            'Response' => $validatedResponse['Response']
-        ]);
+        return $this->validateResponse($request['body']);
     }
-
-    /*    
-    
-        The getAllProducts() is commented because the API returns a lot of products. When inserted the products in the DB
-     the PHP memory limit exceeded. The solution: to get the products On Demand. The getRequestedProducts() function.
-    
-        public function getAllProducts (string $keyAgent): JsonResponse {
-    
-            $this->messagePayload->setAgent($keyAgent);
-            $this->messagePayload->setParameters([
-                "datospagina" => [
-                    "cantidadregistros" => $_ENV['API_QPRODUCTS'],
-                    "pagina" => ""
-                ],
-                "camposderetorno" => [
-                    "irecurso",
-                    "nrecurso",
-                    "clase2"
-                ]
-            ]);
-    
-            $responseData = $this->messagesService->processRequest(
-                messageType: 7,
-                orderNumber: 0,
-                endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatElemInv/"GetListaElemInv"/',
-                payload: $this->messagePayload
-            );
-    
-            $validatedResponse = $this->validateResponse($responseData);
-    
-            return new JsonResponse([
-                'Status' => $validatedResponse['Status'],
-                'Code' => $validatedResponse['Code'],
-                'Response' => $validatedResponse['Response']
-            ]);
-        }*/
-
-    public function getRequestedProducts (array $products): JsonResponse {
-
+    public function getRequestedProducts (array $products): array {
 
         $quotedProducts = array_map(function ($product) {
             return "'$product'";
         }, $products);
 
-        $this->messagePayload->setAgent($this->requestStack->getSession()->get('keyAgent'));
+        $this->messagePayload->setAgent($this->keyAgent);
         $this->messagePayload->setParameters([
             "datospagina" => [
                 "cantidadregistros" => $_ENV['API_QPRODUCTS']
@@ -188,65 +144,54 @@ class ContapymeService
             ]
         ]);
 
-        $responseData = $this->messagesService->processRequest(
+        $request = $this->messagesService->processRequest(
             messageType: 7,
             orderNumber: 0,
             endpoint: $_ENV['API_SERVER_HOST'] . 'datasnap/rest/TCatElemInv/"GetListaElemInv"/',
             payload: $this->messagePayload
         );
 
-        $validatedResponse = $this->validateResponse($responseData);
+        if ($request['code'] === Response::HTTP_INTERNAL_SERVER_ERROR)
+            return $request;
 
-        return new JsonResponse([
-            'Status' => $validatedResponse['Status'],
-            'Code' => $validatedResponse['Code'],
-            'Response' => $validatedResponse['Response']
-        ]);
+        return $this->validateResponse($request['body']);
     }
+    private function validateResponse (string $response): array {
+        
+        //TODO: validate how to handle the JSON_DECODE exception
+        $responseData = json_decode($response, true, 512, JSON_THROW_ON_ERROR |
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-    /**
-     * This function confirms if accepted message. The API returns the HTTP code in the body.
-     */
 
-    private function validateResponse (array $responseData): array {
-        if ($responseData['Status'] === 'Success') {
-            $response = $responseData['Response'];
+        //Anonymous function for validating the response
+        $validateResponse = function ($response) {
+            $header = $response['result'][0]['encabezado'];
 
-            //Anonymous function for validating the response
-            $validateResponse = function ($response) {
-                $header = $response['result'][0]['encabezado'];
-                $body = $response['result'][0]['respuesta'];
-
-                if ($header['resultado'] === "true") {
+            if ($header['resultado'] === "true") {
+                return [
+                    'code' => Response::HTTP_OK,
+                    'body' => $response['result'][0]['respuesta']
+                ];
+            } else {
+                
+                if($header['imensaje'] === "40")
                     return [
-                        'Status' => 'Success',
-                        'Code' => 200, //Value set as default due to the API doesn't return a code when message
-                        // accepted. 
-                        'Response' => $body
+                        'code' => Response::HTTP_BAD_REQUEST,
+                        'body' => $header['mensaje']
                     ];
-                } else {
+                else 
                     return [
-                        'Status' => 'Error',
-                        'Code' => intval($header['imensaje']),
-                        'Response' => $header['mensaje']
+                        'code' => intval($header['imensaje']),
+                        'body' => $header['mensaje']
                     ];
-                }
-            };
+            }
+        };
 
-            $validatedResponse = $validateResponse($response); //Calling the anonymous function
+        $validatedResponse = $validateResponse($responseData); //Calling the anonymous function
 
-            return [
-                'Status' => $validatedResponse['Status'],
-                'Code' => $validatedResponse['Code'],
-                'Response' => $validatedResponse['Response']['datos'] ?? $validatedResponse['Response']
-            ];
-
-        } else {
-            return [
-                'Status' => 'Error',
-                'Code' => $responseData['Code'],
-                'Response' => $responseData['Response']
-            ];
-        }
+        return [
+            'code' => $validatedResponse['code'],
+            'body' => $validatedResponse['body']
+        ];
     }
 }
