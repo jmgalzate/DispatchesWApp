@@ -4,10 +4,11 @@ namespace App\Service;
 
 use App\Entity\Message\Payload;
 use App\Entity\Message\Message;
-use PhpParser\Node\Stmt\TryCatch;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MessagesService
 {
@@ -19,14 +20,15 @@ class MessagesService
     ) {
     }
 
-    public function processRequest (int $messageType, int $orderNumber, string $endpoint, Payload $payload): array {
+    public function processRequest (int $messageType, int $orderNumber, string $endpoint, Payload $payload): JsonResponse {
+
         $this->message = new Message();
 
         $this->message->setMessageType($messageType);
         $this->message->setOrderNumber($orderNumber);
         $this->message->setEndpoint($endpoint);
         $this->message->setCreatedAt(new \DateTime());
-
+        
         $this->message->setPayload(json_encode([
             '_parameters' => [
                 $payload->getParameters(),
@@ -36,7 +38,7 @@ class MessagesService
             ]
         ]));
 
-        $responseData = $this->sendMessage(
+        $request = $this->sendMessage(
             endpoint: $endpoint,
             payload: [
                 $payload->getParameters(),
@@ -46,44 +48,41 @@ class MessagesService
             ]
         );
 
-        $this->message->setResponse(json_encode($responseData['Response']));
+        $this->message->setHttpStatus($request->getStatusCode());
+        $this->message->setResponse($request->getContent());
+        
         $messageId = $this->saveMessage();
 
-        return [
-            'MessageId' => $messageId,
-            'Status' => $responseData['Status'],
-            'Code' => $responseData['Code'],
-            'Response' => $responseData['Response']
-        ];
+        return new JsonResponse([
+            "MessageId" => $messageId,
+            "body" => $request->getContent()
+        ], $request->getStatusCode());
     }
+    
+    private function sendMessage (string $endpoint, array $payload): JsonResponse {
 
-    private function sendMessage (string $endpoint, array $payload): array {
-
-        try {
-            $response = $this->httpClient->request(
+        try{
+            $request = $this->httpClient->request(
                 method: 'POST',
                 url: $endpoint,
                 options: [
-                    'json' => ['_parameters' => $payload],
-                    'timeout' => 300, // Timeout set to 300 seconds
+                    'json' => ['_parameters' => $payload]
                 ]
             );
-
-            $responseCode = $response->getStatusCode();
-            $responseBody = $response->toArray();
-        } catch (TransportException|\Exception  $e) {
-            $responseCode = $e->getCode();
-            $responseBody = $e->getMessage();
+            
+            $response = [
+                "code" => $request->getStatusCode(),
+                "body" => $request->getContent()
+            ];
+            
+        } catch (TransportExceptionInterface $e) {
+            $response = [
+                "code" => Response::HTTP_INTERNAL_SERVER_ERROR,
+                "body" => $e->getMessage()
+            ];
         }
 
-        $this->message->setHttpStatus($responseCode);
-
-        return [
-            'Status' => $responseCode === 200 ? 'Success' : 'Error',
-            'Code' => $responseCode,
-            'Response' => $responseBody
-        ];
-
+        return new JsonResponse(["body" => $response['body']], $response['code']);
     }
 
     private function saveMessage (): int {
