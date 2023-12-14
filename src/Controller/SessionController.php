@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Service\ContapymeService;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,10 +19,8 @@ class SessionController extends AbstractController
     }
 
     #[Route('/session/login', name: 'app_session_login', methods: ['GET'])]
-    public function login(): JsonResponse
+    public function login(Request $request): JsonResponse
     {
-        $request = $this->requestStack->getCurrentRequest();
-        
         if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
             return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
@@ -50,10 +49,8 @@ class SessionController extends AbstractController
     }
 
     #[Route('/session/logout', name: 'app_session_logout', methods: ['GET'])]
-    public function logout(): Response
+    public function logout(Request $request): Response
     {
-        $request = $this->requestStack->getCurrentRequest();
-
         if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
             return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
         }
