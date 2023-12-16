@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Pages;
 
 use App\Entity\Delivery;
 use Doctrine\ORM\EntityManagerInterface;

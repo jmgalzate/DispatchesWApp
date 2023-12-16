@@ -12,10 +12,6 @@ class ContapymeService
     private Payload $messagePayload;
     private string $keyAgent;
     private array $actions = [
-        1 => [
-            "name" => "PROCESS",
-            "messageType" => 6
-        ],
         2 => [
             "name" => "UNPROCESS",
             "messageType" => 2
@@ -31,7 +27,11 @@ class ContapymeService
         5 => [
             "name" => "CALCULAR IMPUESTOS",
             "messageType" => 5
-        ]
+        ],
+        6 => [
+            "name" => "PROCESS",
+            "messageType" => 6
+        ],
     ];
 
     /**

@@ -45,29 +45,19 @@ class ProductRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
-
-//    /**
-//     * @return Product[] Returns an array of Product objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('p.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
-
-//    public function findOneBySomeField($value): ?Product
-//    {
-//        return $this->createQueryBuilder('p')
-//            ->andWhere('p.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    
+    public function saveOrUpdate (Product $product): void {
+        
+        $existingProduct = $this->findOneBy(['code' => $product->getCode()]);
+        
+        if ($existingProduct) {
+            // Update existing product
+            $existingProduct->setName($product->getName());
+            $existingProduct->setBarcode($product->getBarcode());
+            $this->save($existingProduct, true);
+        } else {
+            // Insert new product
+            $this->save($product, true);
+        }
+    }
 }
