@@ -4,11 +4,12 @@ namespace App\Entity;
 
 use App\Repository\DeliveryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Delivery\Product as deliveryProduct;
 
 #[ORM\Entity(repositoryClass: DeliveryRepository::class)]
 #[ORM\Table(name: 'delivery')]
 
-class Delivery
+class Delivery implements \JsonSerializable
 {
     #[ ORM\Column(type: 'integer') ]
     #[ ORM\Id ]
@@ -34,8 +35,9 @@ class Delivery
     private ?float $efficiency = null;
     
     #[ORM\Column(name: 'productsList', type: 'json')]
+    
     /**
-     * @var array<App\Entity\Delivery\Product>
+     * @var deliveryProduct[]
      */
     private ?array $productsList = null;
     
@@ -104,15 +106,29 @@ class Delivery
     }
 
     /**
-     * @return array<App\Entity\Delivery\Product>
+     * @return deliveryProduct[]|null
      */
     public function getProductsList (): ?array {
         return $this->productsList;
     }
     
     public function setProductsList (array $productsList): self {
-        $this->productsList = $productsList;
         
+        $this->productsList = $productsList;
         return $this;
+    }
+
+    #[\Override] public function jsonSerialize(): array
+    {
+        
+        return [
+            'orderNumber' => $this->orderNumber,
+            'customerId' => $this->customerId,
+            'createdAt' => $this->createdAt,
+            'totalRequested' => $this->totalRequested,
+            'totalDispatched' => $this->totalDispatched,
+            'efficiency' => $this->efficiency,
+            'productsList' => $this->productsList
+        ];
     }
 }

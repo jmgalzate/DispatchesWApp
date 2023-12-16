@@ -66,12 +66,17 @@ class OrderController extends AbstractController
         
         $productsToDispatch = $this->productService->setProductsLists($order->getListaproductos());
         
-        dd($productsToDispatch);
+        $delivery = new Delivery();
+        $delivery->setOrderNumber($orderNumber);
+        $delivery->setCustomerId($order->getDatosprincipales()->init);
+        $delivery->setCreatedAt(new \DateTime());
+        $delivery->setTotalRequested(0);
+        $delivery->setTotalDispatched(0);
+        $delivery->setEfficiency(0);
+        $delivery->setProductsList($productsToDispatch);
         
 
-        $jsonResponse = new JsonResponse([
-            "listaproductos" => $productsToDispatch,
-        ]);
+        $jsonResponse = new JsonResponse($delivery->jsonSerialize());
         $jsonResponse->setStatusCode(Response::HTTP_OK);
 
         return $jsonResponse;

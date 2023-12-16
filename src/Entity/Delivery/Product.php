@@ -2,7 +2,9 @@
 
 namespace App\Entity\Delivery;
 
-class Product extends \App\Entity\Product
+use App\Entity\Product as ProductEntity;
+
+class Product extends ProductEntity implements \JsonSerializable
 {
     
     private ?int $requestedQuantity = null;
@@ -44,4 +46,13 @@ class Product extends \App\Entity\Product
         return $this;
     }
 
+    #[\Override] public function jsonSerialize (): array {
+        return [
+            'name' => $this->getName(),
+            'barcode' => $this->getBarcode(),
+            'code' => $this->getCode(),
+            'requestedQuantity' => $this->getRequestedQuantity(),
+            'deliveredQuantity' => $this->getDeliveredQuantity()
+        ];
+    }
 }
