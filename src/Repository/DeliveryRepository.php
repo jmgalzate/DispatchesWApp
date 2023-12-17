@@ -108,4 +108,26 @@ class DeliveryRepository extends ServiceEntityRepository
         }
         
     }
+
+    public function saveOrUpdate (Delivery $delivery): int {
+
+        $existingDelivery = $this->findOneBy(['orderNumber' => $delivery->getOrderNumber()]);
+
+        if ($existingDelivery) {
+            // Update existing product
+            $existingDelivery->setOrderNumber($delivery->getOrderNumber());
+            $existingDelivery->setCustomerId($delivery->getCustomerId());
+            $existingDelivery->setCreatedAt($delivery->getCreatedAt());
+            $existingDelivery->setTotalRequested($delivery->getTotalRequested());
+            $existingDelivery->setTotalDispatched($delivery->getTotalDispatched());
+            $existingDelivery->setEfficiency($delivery->getEfficiency());
+            $existingDelivery->setProductsList($delivery->getProductsList());
+            $this->save($existingDelivery, true);
+            return $existingDelivery->getId();
+        } else {
+            // Insert new product
+            $this->save($delivery, true);
+            return $delivery->getId();
+        }
+    }
 }

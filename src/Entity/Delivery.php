@@ -45,6 +45,12 @@ class Delivery implements \JsonSerializable
         return $this->id;
     }
     
+    public function setId (int $id): self {
+        $this->id = $id;
+        
+        return $this;
+    }
+    
     public function getOrderNumber (): ?int {
         return $this->orderNumber;
     }
@@ -122,6 +128,7 @@ class Delivery implements \JsonSerializable
     {
         
         return [
+            'id' => $this->id,
             'orderNumber' => $this->orderNumber,
             'customerId' => $this->customerId,
             'createdAt' => $this->createdAt,

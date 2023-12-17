@@ -6,6 +6,7 @@ use App\Entity\Delivery;
 use App\Entity\Order;
 use App\Service\ContapymeService;
 use App\Service\ProductService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +17,8 @@ class OrderController extends AbstractController
 {
     public function __construct (
         private readonly ContapymeService $contapymeService,
-        private readonly ProductService  $productService
+        private readonly ProductService  $productService,
+        private readonly EntityManagerInterface $entityManager
     ) {
     }
 
@@ -29,8 +31,9 @@ class OrderController extends AbstractController
      * 4. Validate if the order contains any product to dispatch.
      * 5. With the products list, request the products information (name, barcode, code) to Contapyme and record them
      * in the database.
-     * 6. Sets the Delivery object with the order data and the products list.
+     * 6. Sets the Delivery object with the order data, and the products list.
      */
+    
     #[Route('/order/id={orderNumber}', name: 'getOrder', methods: ['GET'])]
     public function order (Request $request, int $orderNumber): JsonResponse {
 
@@ -74,11 +77,32 @@ class OrderController extends AbstractController
         $delivery->setTotalDispatched(0);
         $delivery->setEfficiency(0);
         $delivery->setProductsList($productsToDispatch);
-        
+
+
+        $deliveryId = $this->entityManager->getRepository(Delivery::class)->saveOrUpdate($delivery);
+        $delivery->setId($deliveryId);
 
         $jsonResponse = new JsonResponse($delivery->jsonSerialize());
         $jsonResponse->setStatusCode(Response::HTTP_OK);
 
+        return $jsonResponse;
+    }
+    
+    #[Route('/order/id={orderNumber}', name: 'updateOrder', methods: ['PUT'])]
+    public function updateOrder (Request $request): JsonResponse {
+        
+        if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
+            return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
+        }
+        
+        
+        
+        $jsonResponse = new JsonResponse([
+            'code' => Response::HTTP_OK,
+            'message' => 'La orden ha sido actualizada.'
+        ]);
+        $jsonResponse->setStatusCode(Response::HTTP_OK);
+        
         return $jsonResponse;
     }
 
