@@ -22,18 +22,6 @@ class OrderController extends AbstractController
   ) {
   }
 
-
-  /**
-   * Getting an order from Contapyme executes the following steps:
-   * 1. Set the order as UNPROCESSED in Contapyme.
-   * 2. Request the order to Contapyme.
-   * 3. Deserialize the order data into an App\Entity\Order object.
-   * 4. Validate if the order contains any product to dispatch.
-   * 5. With the products list, request the products information (name, barcode, code) to Contapyme and record them
-   * in the database.
-   * 6. Sets the Delivery object with the order data, and the products list.
-   */
-
   #[Route('/order/id={orderNumber}', name: 'getOrder', methods: ['GET'])]
   public function getOrder (Request $request, int $orderNumber): JsonResponse {
 
@@ -41,25 +29,29 @@ class OrderController extends AbstractController
       return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
     }
 
-    /*$orderUnprocessed = $this->contapymeService->agentAction(
-        actionId: 2,
-        orderNumber: $orderNumber
-    );*/
+    /** 1. The order is Unprocessed */
+    $orderUnprocessed = $this->contapymeService->agentAction(
+      actionId: 2,
+      orderNumber: $orderNumber
+    );
 
+    /** 2. The order is requested */
     $orderRequest = $this->contapymeService->agentAction(
       actionId: 3,
       orderNumber: $orderNumber
     );
 
-    if (/*$orderUnprocessed['code'] !== Response::HTTP_OK ||*/ $orderRequest['code'] !== Response::HTTP_OK) {
+    if ($orderUnprocessed['code'] !== Response::HTTP_OK || $orderRequest['code'] !== Response::HTTP_OK) {
       return new JsonResponse([
         'code' => $orderRequest['code'],
         'message' => $orderRequest['body']
       ]);
     }
 
+    /** 3. The order is deserialized */
     $order = new Order($orderRequest['body']['datos']);
 
+    /** 4. The order is validated */
     if (empty($order->getListaproductos())) {
       return new JsonResponse([
         'code' => Response::HTTP_NO_CONTENT,
@@ -67,8 +59,10 @@ class OrderController extends AbstractController
       ], Response::HTTP_NO_CONTENT);
     }
 
+    /** 5. The products list is requested */
     $productsToDispatch = $this->productService->setProductsLists($order->getListaproductos());
 
+    /** 6. The Delivery object is created and recorded in the Database */
     $delivery = (new Delivery())
       ->setOrderNumber($orderNumber)
       ->setCustomerId($order->getDatosprincipales()->init)
@@ -77,10 +71,11 @@ class OrderController extends AbstractController
       ->setTotalDispatched(0)
       ->setEfficiency(0)
       ->setProductsList($productsToDispatch);
-
-
+    
     $deliveryId = $this->entityManager->getRepository(Delivery::class)->saveOrUpdate($delivery);
     $delivery->setId($deliveryId);
+    
+    /** 7. The Delivery object is serialized and returned */
 
     $jsonResponse = new JsonResponse($delivery->jsonSerialize());
     $jsonResponse->setStatusCode(Response::HTTP_OK);
@@ -94,31 +89,45 @@ class OrderController extends AbstractController
     if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
       return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
     }
-    
 
-    /*$orderSaved = $this->contapymeService->agentAction(
-        actionId: 4,
-        orderNumber: 123456,
-        newOrder: [] 
+    try {
+      $order = json_decode($request->getContent(), true);
+      $orderNumber = $order['orderNumber'];
+    } catch (\Exception $e) {
+      return new JsonResponse([
+        'code' => Response::HTTP_BAD_REQUEST,
+        'message' => 'La orden no pudo ser cerrada.'
+      ]);
+    }
+
+    /**
+     * TODO: Set the new Order object in Contapyme.
+     * TODO:Update the Delivery information with the dispatched items.
+     */
+
+    $orderSaved = $this->contapymeService->agentAction(
+      actionId: 4,
+      orderNumber: $orderNumber,
+      newOrder: []
     );
 
     $orderTaxes = $this->contapymeService->agentAction(
-        actionId: 5,
-        orderNumber: 123456,
-        newOrder: []
+      actionId: 5,
+      orderNumber: $orderNumber,
+      newOrder: []
     );
 
     $orderProcessed = $this->contapymeService->agentAction(
-        actionId: 6,
-        orderNumber: 123456
+      actionId: 6,
+      orderNumber: $orderNumber
     );
-    
+
     if ($orderSaved['code'] !== Response::HTTP_OK || $orderTaxes['code'] !== Response::HTTP_OK || $orderProcessed['code'] !== Response::HTTP_OK) {
-        return new JsonResponse([
-            'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-            'message' => 'something'
-        ]);
-    }*/
+      return new JsonResponse([
+        'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+        'message' => 'something'
+      ]);
+    }
 
     $jsonResponse = new JsonResponse([
       'code' => $request->getAcceptableContentTypes(),
