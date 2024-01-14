@@ -29,22 +29,30 @@ class OrderController extends AbstractController
       return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
     }
 
-    /** 1. The order is Unprocessed */
-    $orderUnprocessed = $this->contapymeService->agentAction(
-      actionId: 2,
-      orderNumber: $orderNumber
-    );
+    try {
+      /** 1. The order is Unprocessed */
+      $orderUnprocessed = $this->contapymeService->agentAction(
+        actionId: 2,
+        orderNumber: $orderNumber
+      );
 
-    /** 2. The order is requested */
-    $orderRequest = $this->contapymeService->agentAction(
-      actionId: 3,
-      orderNumber: $orderNumber
-    );
+      if ($orderUnprocessed['code'] !== Response::HTTP_OK) {
+        throw new \Exception($orderUnprocessed['body']);
+      }
 
-    if ($orderUnprocessed['code'] !== Response::HTTP_OK || $orderRequest['code'] !== Response::HTTP_OK) {
+      /** 2. The order is requested */
+      $orderRequest = $this->contapymeService->agentAction(
+        actionId: 3,
+        orderNumber: $orderNumber
+      );
+
+      if ($orderRequest['code'] !== Response::HTTP_OK) {
+        throw new \Exception($orderRequest['body']);
+      }
+    } catch (\Exception $e) {
       return new JsonResponse([
-        'code' => $orderRequest['code'],
-        'message' => $orderRequest['body']
+        'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+        'message' => $e->getMessage()
       ]);
     }
 
