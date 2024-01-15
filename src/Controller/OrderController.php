@@ -62,7 +62,7 @@ class OrderController extends AbstractController
 
         $order->setIprocess(2); // 2 = Unprocessed
       }
-      
+
       /** 6. The Order is recorded in the DB */
       $this->entityManager->getRepository(Order::class)->save($order);
 
@@ -86,8 +86,7 @@ class OrderController extends AbstractController
       ->setEfficiency(0)
       ->setProductsList($productsToDispatch);
 
-    $deliveryId = $this->entityManager->getRepository(Delivery::class)->saveOrUpdate($delivery);
-    $delivery->setId($deliveryId);
+    $this->entityManager->getRepository(Delivery::class)->save($delivery, true);
 
     /** 9. The Delivery object is serialized and returned */
 
@@ -105,51 +104,102 @@ class OrderController extends AbstractController
     }
 
     try {
-      $order = json_decode($request->getContent(), true);
-      $orderNumber = $order['orderNumber'];
+
+      /** Setting the received Delivery */
+
+      $deliveryData = json_decode($request->getContent(), true);
+      $delivery = (new Delivery())
+        ->setId($deliveryData['id'])
+        ->setOrderNumber($deliveryData['orderNumber'])
+        ->setCustomerId($deliveryData['customerId'])
+        ->setCreatedAt($deliveryData['createdAt'])
+        ->setTotalRequested($deliveryData['totalRequested'])
+        ->setTotalDispatched($deliveryData['totalDispatched'])
+        ->setEfficiency($deliveryData['efficiency'])
+        ->setProductsList($deliveryData['productsList']);
+      $this->entityManager->getRepository(Delivery::class)->update($delivery);
+
+
+      /** Getting the Order from the Database */
+      $order = $this->entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $delivery->getOrderNumber()]);
+
+      /** Updating some data in the Order object */
+      $order->setLiquidacion(new Order\Settlement());
+      $order->setIusuarioult("WEBAPI");
+
+      /** Set the new products list  */
+      $productsList = [];
+
+      foreach ($order->getListaproductos() as $requestedProduct) {
+
+        foreach ($delivery->getProductsList() as $dispatchedProduct) {
+          if ($requestedProduct->irecurso === $dispatchedProduct->getCode()) {
+
+            if ($dispatchedProduct->getDeliveredQuantity() !== 0) {
+              $requestedProduct->qrecurso = $dispatchedProduct->getDeliveredQuantity();
+
+              $newPrice = $requestedProduct->qrecurso * $requestedProduct->mprecio;
+              $discount = $requestedProduct->qporcdescuento / 100;
+
+              $requestedProduct->mvrtotal = ($newPrice - ($newPrice * $discount));
+
+              $productsList[] = $requestedProduct;
+            }
+
+          }
+        }
+      }
+
+      $order->setListaproductos($productsList);
+      
+      /** Update the Order in the database */
+      $this->entityManager->getRepository(Order::class)->update($order);
+      
+
+      $orderSaved = $this->contapymeService->agentAction(
+        actionId: 4,
+        orderNumber: $delivery->getOrderNumber(),
+        newOrder: $order->jsonSerialize()
+      );
+
+      if ($orderSaved['code'] !== Response::HTTP_OK)
+        throw new \Exception('Falló el intento de "Guardar" la orden en Contapyme; por favor valide los logs para obtener más detalles de la transacción.');
+
+      $orderTaxes = $this->contapymeService->agentAction(
+        actionId: 5,
+        orderNumber: $delivery->getOrderNumber(),
+        newOrder: $order->jsonSerialize()
+      );
+
+      if ($orderTaxes['code'] !== Response::HTTP_OK)
+        throw new \Exception('Falló el intento de "Calcular los Impuestos" de la orden en Contapyme; por favor valide los logs para obtener más detalles de la transacción.');
+
+
+      /** 2. Try to process the Order */
+      $orderProcessed = $this->contapymeService->agentAction(
+        actionId: 6,
+        orderNumber: $delivery->getOrderNumber()
+      );
+
+      if ($orderProcessed['code'] !== Response::HTTP_OK)
+        throw new \Exception('Falló el intento de "Procesar" la orden en Contapyme; por favor verifique y procésela manualmente.');
+
+      /** 3. Confirm the Order is closed in this API without changes in Contapyme. */
+      $jsonResponse = new JsonResponse([
+        'code' => Response::HTTP_OK,
+        'message' => 'La orden ha sido guardada en Contapyme y procesada correctamente.'
+      ]);
+
+      $jsonResponse->setStatusCode(Response::HTTP_OK);
+
+      return $jsonResponse;
+
     } catch (\Exception $e) {
       return new JsonResponse([
-        'code' => Response::HTTP_BAD_REQUEST,
-        'message' => 'La orden no pudo ser cerrada.'
+        'code' => Response::HTTP_NOT_MODIFIED,
+        'message' => $e->getMessage()
       ]);
     }
-
-    /**
-     * TODO: Set the new Order object in Contapyme.
-     * TODO:Update the Delivery information with the dispatched items.
-     */
-
-    $orderSaved = $this->contapymeService->agentAction(
-      actionId: 4,
-      orderNumber: $orderNumber,
-      newOrder: []
-    );
-
-    $orderTaxes = $this->contapymeService->agentAction(
-      actionId: 5,
-      orderNumber: $orderNumber,
-      newOrder: []
-    );
-
-    $orderProcessed = $this->contapymeService->agentAction(
-      actionId: 6,
-      orderNumber: $orderNumber
-    );
-
-    if ($orderSaved['code'] !== Response::HTTP_OK || $orderTaxes['code'] !== Response::HTTP_OK || $orderProcessed['code'] !== Response::HTTP_OK) {
-      return new JsonResponse([
-        'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-        'message' => 'something'
-      ]);
-    }
-
-    $jsonResponse = new JsonResponse([
-      'code' => $request->getAcceptableContentTypes(),
-      'message' => $request->getContent()
-    ]);
-    $jsonResponse->setStatusCode(Response::HTTP_OK);
-
-    return $jsonResponse;
   }
 
   #[Route('/order', name: 'closeOrder', methods: ['POST'])]
