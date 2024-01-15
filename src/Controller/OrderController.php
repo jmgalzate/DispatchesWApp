@@ -30,25 +30,40 @@ class OrderController extends AbstractController
     }
 
     try {
-      /** 1. The order is Unprocessed */
-      $orderUnprocessed = $this->contapymeService->agentAction(
-        actionId: 2,
-        orderNumber: $orderNumber
-      );
 
-      if ($orderUnprocessed['code'] !== Response::HTTP_OK) {
-        throw new \Exception($orderUnprocessed['body']);
-      }
-
-      /** 2. The order is requested */
+      /** 1. Try to get the order */
       $orderRequest = $this->contapymeService->agentAction(
         actionId: 3,
         orderNumber: $orderNumber
       );
 
-      if ($orderRequest['code'] !== Response::HTTP_OK) {
+      if ($orderRequest['code'] !== Response::HTTP_OK)
         throw new \Exception($orderRequest['body']);
+
+
+      /** 2. Deserialize the order*/
+      $order = new Order($orderRequest['body']['datos']);
+
+      /** 3. Validate if there are products in the Order*/
+      if (empty($order->getListaproductos()))
+        throw new \Exception('La orden ' . $orderNumber . ' no tiene productos para despachar.');
+
+
+      /** 4. Check if the order is processed to unprocess it */
+      if ($order->getEncabezado()->iprocess === 0) {
+        
+        /** 5. Unprocess the order */
+        $orderUnprocessed = $this->contapymeService->agentAction(
+          actionId: 2,
+          orderNumber: $orderNumber
+        );
+
+        if ($orderUnprocessed['code'] !== Response::HTTP_OK) 
+          throw new \Exception($orderUnprocessed['body']);
+        
+        $order->setIprocess(2); // 2 = Unprocessed
       }
+
     } catch (\Exception $e) {
       return new JsonResponse([
         'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
@@ -56,21 +71,10 @@ class OrderController extends AbstractController
       ]);
     }
 
-    /** 3. The order is deserialized */
-    $order = new Order($orderRequest['body']['datos']);
-
-    /** 4. The order is validated */
-    if (empty($order->getListaproductos())) {
-      return new JsonResponse([
-        'code' => Response::HTTP_NO_CONTENT,
-        'message' => 'La orden ' . $orderNumber . ' no tiene productos para despachar.'
-      ], Response::HTTP_NO_CONTENT);
-    }
-
-    /** 5. The products list is requested */
+    /** 6. Set the products to Dispatch */
     $productsToDispatch = $this->productService->setProductsLists($order->getListaproductos());
 
-    /** 6. The Delivery object is created and recorded in the Database */
+    /** 7. Set and record the Delivery request */
     $delivery = (new Delivery())
       ->setOrderNumber($orderNumber)
       ->setCustomerId($order->getDatosprincipales()->init)
@@ -79,11 +83,11 @@ class OrderController extends AbstractController
       ->setTotalDispatched(0)
       ->setEfficiency(0)
       ->setProductsList($productsToDispatch);
-    
+
     $deliveryId = $this->entityManager->getRepository(Delivery::class)->saveOrUpdate($delivery);
     $delivery->setId($deliveryId);
-    
-    /** 7. The Delivery object is serialized and returned */
+
+    /** 8. The Delivery object is serialized and returned */
 
     $jsonResponse = new JsonResponse($delivery->jsonSerialize());
     $jsonResponse->setStatusCode(Response::HTTP_OK);

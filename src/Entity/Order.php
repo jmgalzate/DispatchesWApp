@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use AllowDynamicProperties;
 use App\Entity\Order\MainData;
 use App\Entity\Order\Header;
 use App\Entity\Order\Settlement;
 use App\Entity\Order\Product;
 
-class Order
+#[AllowDynamicProperties] class Order
 {
     private ?Header $encabezado;
     private ?Settlement $liquidacion;
@@ -197,6 +198,12 @@ class Order
     public function setQoprsok(?string $qoprsok): self
     {
         $this->qoprsok = $qoprsok;
+        
+        return $this;
+    }
+    
+    public function setIprocess (int $iprocess): self {
+        $this->encabezado->iprocess = $iprocess;
         
         return $this;
     }
