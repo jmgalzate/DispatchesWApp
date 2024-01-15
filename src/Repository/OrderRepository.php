@@ -28,4 +28,12 @@ class OrderRepository extends ServiceEntityRepository
       $this->getEntityManager()->flush();
     }
   }
+  
+  public function update (Order $entity, bool $flush = false): void {
+    $this->getEntityManager()->merge($entity);
+
+    if ($flush) {
+      $this->getEntityManager()->flush();
+    }
+  }
 }
