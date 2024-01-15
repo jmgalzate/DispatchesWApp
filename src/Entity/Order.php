@@ -21,20 +21,20 @@ use Doctrine\ORM\Mapping as ORM;
   #[ORM\GeneratedValue]
   private ?int $id = null;
   
-  #[ORM\Column(name: 'order_number', type: 'integer')]
+  #[ORM\Column(name: 'orderNumber', type: 'integer')]
   private ?int $orderNumber = null;
 
-  #[ORM\Column(name: 'encabezado', type: 'TEXT')]
+  #[ORM\Column(name: 'encabezado', type: 'json')]
   private ?Header $encabezado;
 
-  #[ORM\Column(name: 'liquidacion', type: 'TEXT')]
+  #[ORM\Column(name: 'liquidacion', type: 'json')]
   private ?Settlement $liquidacion;
 
-  #[ORM\Column(name: 'datosprincipales', type: 'TEXT')]
+  #[ORM\Column(name: 'datosprincipales', type: 'json')]
   private ?MainData $datosprincipales;
 
   /** @var Product[] */
-  #[ORM\Column(name: 'listaproductos', type: 'TEXT')]
+  #[ORM\Column(name: 'listaproductos', type: 'json')]
   private array $listaproductos;
 
   #[ORM\Column(name: 'qoprsok', type: 'string', length: 10, nullable: true)]
