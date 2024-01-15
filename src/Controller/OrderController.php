@@ -42,7 +42,7 @@ class OrderController extends AbstractController
 
 
       /** 2. Deserialize the order*/
-      $order = new Order($orderRequest['body']['datos']);
+      $order = Order::fromArray($orderRequest['body']);
 
       /** 3. Validate if there are products in the Order*/
       if (empty($order->getListaproductos()))
