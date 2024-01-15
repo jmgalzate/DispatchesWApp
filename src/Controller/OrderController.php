@@ -42,7 +42,7 @@ class OrderController extends AbstractController
 
 
       /** 2. Deserialize the order*/
-      $order = Order::fromArray($orderRequest['body']);
+      $order = Order::fromArray(orderNumber: $orderNumber, orderData: $orderRequest['body']);
 
       /** 3. Validate if there are products in the Order*/
       if (empty($order->getListaproductos()))
@@ -63,6 +63,9 @@ class OrderController extends AbstractController
 
         $order->setIprocess(2); // 2 = Unprocessed
       }
+      
+      /** 6. The Order is recorded in the DB */
+      $this->entityManager->getRepository(Order::class)->save($order);
 
     } catch (\Exception $e) {
       return new JsonResponse([
@@ -71,10 +74,10 @@ class OrderController extends AbstractController
       ]);
     }
 
-    /** 6. Set the products to Dispatch */
+    /** 7. Set the products to Dispatch */
     $productsToDispatch = $this->productService->setProductsLists($order->getListaproductos());
 
-    /** 7. Set and record the Delivery request */
+    /** 8. Set and record the Delivery request */
     $delivery = (new Delivery())
       ->setOrderNumber($orderNumber)
       ->setCustomerId($order->getDatosprincipales()->init)
@@ -87,7 +90,7 @@ class OrderController extends AbstractController
     $deliveryId = $this->entityManager->getRepository(Delivery::class)->saveOrUpdate($delivery);
     $delivery->setId($deliveryId);
 
-    /** 8. The Delivery object is serialized and returned */
+    /** 9. The Delivery object is serialized and returned */
 
     $jsonResponse = new JsonResponse($delivery->jsonSerialize());
     $jsonResponse->setStatusCode(Response::HTTP_OK);

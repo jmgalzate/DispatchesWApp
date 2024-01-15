@@ -20,6 +20,9 @@ use Doctrine\ORM\Mapping as ORM;
   #[ORM\Id]
   #[ORM\GeneratedValue]
   private ?int $id = null;
+  
+  #[ORM\Column(name: 'orderNumber', type: 'integer')]
+  private ?int $orderNumber = null;
 
   #[ORM\Column(name: 'header', type: 'TEXT')]
   private ?Header $encabezado;
@@ -39,6 +42,16 @@ use Doctrine\ORM\Mapping as ORM;
 
   public function getId (): ?int {
     return $this->id;
+  }
+  
+  public function getOrderNumber (): ?int {
+    return $this->orderNumber;
+  }
+  
+  public function setOrderNumber (int $orderNumber): self {
+    $this->orderNumber = $orderNumber;
+    
+    return $this;
   }
 
   public function getEncabezado (): ?Header {
@@ -101,9 +114,11 @@ use Doctrine\ORM\Mapping as ORM;
   }
 
   /** This method deserialize the Order object(array) for each attribute object */
-  public static function fromArray (array $orderData): self {
+  public static function fromArray (int $orderNumber, array $orderData): self {
 
     $order = new self();
+    
+    $order->setOrderNumber($orderNumber);
 
     $header = new Header();
     $header->tdetalle = $orderData['encabezado']['tdetalle'];
