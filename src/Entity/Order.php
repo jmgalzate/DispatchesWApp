@@ -112,6 +112,24 @@ use Doctrine\ORM\Mapping as ORM;
 
     return $this;
   }
+  
+  public function setIusuarioult (string $iusuarioult): self {
+    $this->encabezado->iusuarioult = $iusuarioult;
+
+    return $this;
+  }
+
+  public function jsonSerialize(): array
+  {
+
+    return [
+      'encabezado' => $this->encabezado,
+      'liquidacion' => $this->liquidacion,
+      'datosprincipales' => $this->datosprincipales,
+      'listaproductos' => $this->listaproductos,
+      'qoprsok' => $this->qoprsok,
+    ];
+  }
 
   /** This method deserialize the Order object(array) for each attribute object */
   public static function fromArray (int $orderNumber, array $orderData): self {
