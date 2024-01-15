@@ -51,16 +51,16 @@ class OrderController extends AbstractController
 
       /** 4. Check if the order is processed to unprocess it */
       if ($order->getEncabezado()->iprocess === 0) {
-        
+
         /** 5. Unprocess the order */
         $orderUnprocessed = $this->contapymeService->agentAction(
           actionId: 2,
           orderNumber: $orderNumber
         );
 
-        if ($orderUnprocessed['code'] !== Response::HTTP_OK) 
+        if ($orderUnprocessed['code'] !== Response::HTTP_OK)
           throw new \Exception($orderUnprocessed['body']);
-        
+
         $order->setIprocess(2); // 2 = Unprocessed
       }
 
@@ -158,39 +158,35 @@ class OrderController extends AbstractController
     }
 
     try {
+
+      /** 1. Get the order number */
       $order = json_decode($request->getContent(), true);
       $orderNumber = $order['orderNumber'];
+
+      /** 2. Try to process the Order */
+      $orderProcessed = $this->contapymeService->agentAction(
+        actionId: 6,
+        orderNumber: $orderNumber
+      );
+
+      if ($orderProcessed['code'] !== Response::HTTP_OK)
+        throw new \Exception('Falló el intento de "Procesar" la orden en Contapyme; por favor verifique y procésela manualmente.');
+
+      /** 3. Confirm the Order is closed in this API without changes in Contapyme. */
+      $jsonResponse = new JsonResponse([
+        'code' => Response::HTTP_OK,
+        'message' => 'La orden ha sido cerrada sin guardar cambios.'
+      ]);
+
+      $jsonResponse->setStatusCode(Response::HTTP_OK);
+
+      return $jsonResponse;
+
     } catch (\Exception $e) {
       return new JsonResponse([
-        'code' => Response::HTTP_BAD_REQUEST,
-        'message' => 'La orden no pudo ser cerrada.'
+        'code' => Response::HTTP_NOT_MODIFIED,
+        'message' => $e->getMessage()
       ]);
     }
-
-    /**
-     * The order is processed in Contapyme.
-     */
-
-    $orderProcessed = $this->contapymeService->agentAction(
-      actionId: 6,
-      orderNumber: $orderNumber
-    );
-
-    if ($orderProcessed['code'] !== Response::HTTP_OK) {
-      return new JsonResponse([
-        'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
-        'message' => 'something'
-      ]);
-    }
-
-    $jsonResponse = new JsonResponse([
-      'code' => Response::HTTP_OK,
-      'message' => 'La orden ha sido cerrada sin guardar cambios.'
-    ]);
-
-    $jsonResponse->setStatusCode(Response::HTTP_OK);
-
-    return $jsonResponse;
   }
-
 }
