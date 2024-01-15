@@ -40,9 +40,8 @@ class OrderController extends AbstractController
       if ($orderRequest['code'] !== Response::HTTP_OK)
         throw new \Exception($orderRequest['body']);
 
-
       /** 2. Deserialize the order*/
-      $order = Order::fromArray(orderNumber: $orderNumber, orderData: $orderRequest['body']);
+      $order = Order::fromArray(orderNumber: $orderNumber, orderData: $orderRequest['body']['datos']);
 
       /** 3. Validate if there are products in the Order*/
       if (empty($order->getListaproductos()))
