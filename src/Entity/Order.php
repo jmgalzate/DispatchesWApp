@@ -12,7 +12,7 @@ use App\Repository\OrderRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OrderRepository::class)]
-#[ORM\Table(name: 'order')]
+#[ORM\Table(name: 'orders')]
 #[AllowDynamicProperties] class Order
 {
 
@@ -21,20 +21,20 @@ use Doctrine\ORM\Mapping as ORM;
   #[ORM\GeneratedValue]
   private ?int $id = null;
   
-  #[ORM\Column(name: 'orderNumber', type: 'integer')]
+  #[ORM\Column(name: 'order_number', type: 'integer')]
   private ?int $orderNumber = null;
 
-  #[ORM\Column(name: 'header', type: 'TEXT')]
+  #[ORM\Column(name: 'encabezado', type: 'TEXT')]
   private ?Header $encabezado;
 
-  #[ORM\Column(name: 'settlement', type: 'TEXT')]
+  #[ORM\Column(name: 'liquidacion', type: 'TEXT')]
   private ?Settlement $liquidacion;
 
-  #[ORM\Column(name: 'mainData', type: 'TEXT')]
+  #[ORM\Column(name: 'datosprincipales', type: 'TEXT')]
   private ?MainData $datosprincipales;
 
   /** @var Product[] */
-  #[ORM\Column(name: 'productsList', type: 'TEXT')]
+  #[ORM\Column(name: 'listaproductos', type: 'TEXT')]
   private array $listaproductos;
 
   #[ORM\Column(name: 'qoprsok', type: 'string', length: 10, nullable: true)]
