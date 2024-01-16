@@ -22,10 +22,15 @@ class OrderRepository extends ServiceEntityRepository
   }
 
   public function save (Order $entity, bool $flush = false): void {
-    $this->getEntityManager()->persist($entity);
 
-    if ($flush) {
-      $this->getEntityManager()->flush();
+    $orderId = $entity->getId() ? $this->findOneBy(['orderNumber' => $entity->getOrderNumber()]) : null;
+
+    if(!$orderId) {
+      $this->getEntityManager()->persist($entity);
+
+      if ($flush) {
+        $this->getEntityManager()->flush();
+      }
     }
   }
   

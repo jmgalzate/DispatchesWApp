@@ -21,10 +21,15 @@ class DeliveryRepository extends ServiceEntityRepository
   }
 
   public function save (Delivery $entity, bool $flush = false): void {
-    $this->getEntityManager()->persist($entity);
 
-    if ($flush) {
-      $this->getEntityManager()->flush();
+    $deliveryId = $entity->getId() ? $this->findOneBy(['orderNumber' => $entity->getOrderNumber()]) : null;
+    
+    if(!$deliveryId) {
+      $this->getEntityManager()->persist($entity);
+
+      if ($flush) {
+        $this->getEntityManager()->flush();
+      }
     }
   }
 
