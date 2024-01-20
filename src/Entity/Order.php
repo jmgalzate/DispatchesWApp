@@ -58,8 +58,12 @@ use Doctrine\ORM\Mapping as ORM;
     return $this->encabezado;
   }
 
-  public function setEncabezado (Header $encabezado): self {
-    $this->encabezado = $encabezado;
+  public function setEncabezado ($encabezado): self {
+    
+    if(is_array($encabezado))
+      $this->encabezado = Header::fromArray($encabezado);
+    else 
+      $this->encabezado = $encabezado;
 
     return $this;
   }
@@ -68,10 +72,13 @@ use Doctrine\ORM\Mapping as ORM;
     return $this->liquidacion;
   }
 
-  public function setLiquidacion (Settlement $liquidacion): self {
-
-    $this->liquidacion = $liquidacion;
-
+  public function setLiquidacion ($liquidacion): self {
+    
+    if(is_array($liquidacion))
+      $this->liquidacion = Settlement::fromArray($liquidacion);
+    else 
+      $this->liquidacion = $liquidacion;
+    
     return $this;
   }
 
@@ -79,8 +86,12 @@ use Doctrine\ORM\Mapping as ORM;
     return $this->datosprincipales;
   }
 
-  public function setDatosprincipales (MainData $datosprincipales): self {
-    $this->datosprincipales = $datosprincipales;
+  public function setDatosprincipales ($datosprincipales): self {
+    
+    if(is_array($datosprincipales))
+      $this->datosprincipales = MainData::fromArray($datosprincipales);
+    else 
+      $this->datosprincipales = $datosprincipales;
 
     return $this;
   }

@@ -44,4 +44,52 @@ class Header
     public ?string $iclasifop;
     public ?string $iprocess;
     public ?string $mtotaloperacion;
+    
+    public static function fromArray (array $data): self {
+      
+      $header = new self();
+      
+      $header->tdetalle = $data['tdetalle'] ?? null;
+      $header->itdoper = $data['itdoper'] ?? null;
+      $header->snumsop = $data['snumsop'] ?? null;
+      $header->fsoport = $data['fsoport'] ?? null;
+      $header->iccbase = $data['iccbase'] ?? null;
+      $header->imoneda = $data['imoneda'] ?? null;
+      $header->banulada = $data['banulada'] ?? null;
+      $header->blocal = $data['blocal'] ?? null;
+      $header->bniif = $data['bniif'] ?? null;
+      $header->svaloradic1 = $data['svaloradic1'] ?? null;
+      $header->svaloradic2 = $data['svaloradic2'] ?? null;
+      $header->svaloradic3 = $data['svaloradic3'] ?? null;
+      $header->svaloradic4 = $data['svaloradic4'] ?? null;
+      $header->svaloradic5 = $data['svaloradic5'] ?? null;
+      $header->svaloradic6 = $data['svaloradic6'] ?? null;
+      $header->svaloradic7 = $data['svaloradic7'] ?? null;
+      $header->svaloradic8 = $data['svaloradic8'] ?? null;
+      $header->svaloradic9 = $data['svaloradic9'] ?? null;
+      $header->svaloradic10 = $data['svaloradic10'] ?? null;
+      $header->svaloradic11 = $data['svaloradic11'] ?? null;
+      $header->svaloradic12 = $data['svaloradic12'] ?? null;
+      $header->fecha1adic = $data['fecha1adic'] ?? null;
+      $header->fecha2adic = $data['fecha2adic'] ?? null;
+      $header->fecha3adic = $data['fecha3adic'] ?? null;
+      $header->datosaddin = $data['datosaddin'] ?? null;
+      $header->fcreacion = $data['fcreacion'] ?? null;
+      $header->fultima = $data['fultima'] ?? null;
+      $header->fprocesam = $data['fprocesam'] ?? null;
+      $header->iusuario = $data['iusuario'] ?? null;
+      $header->iusuarioult = $data['iusuarioult'] ?? null;
+      $header->isucursal = $data['isucursal'] ?? null;
+      $header->inumoperultimp = $data['inumoperultimp'] ?? null;
+      $header->accionesalgrabar = $data['accionesalgrabar'] ?? null;
+      $header->iemp = $data['iemp'] ?? null;
+      $header->inumoper = $data['inumoper'] ?? null;
+      $header->itdsop = $data['itdsop'] ?? null;
+      $header->inumsop = $data['inumsop'] ?? null;
+      $header->iclasifop = $data['iclasifop'] ?? null;
+      $header->iprocess = $data['iprocess'] ?? null;
+      $header->mtotaloperacion = $data['mtotaloperacion'] ?? null;
+      
+      return $header;
+    }
 }
