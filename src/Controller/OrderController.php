@@ -75,13 +75,19 @@ class OrderController extends AbstractController
 
     /** 7. Set the products to Dispatch */
     $productsToDispatch = $this->productService->setProductsLists($order->getListaproductos());
+    
+    $totalRequested = 0;
+    
+    foreach($productsToDispatch as $product) {
+      $totalRequested += $product->getRequestedQuantity();
+    }
 
     /** 8. Set and record the Delivery request */
     $delivery = (new Delivery())
       ->setOrderNumber($orderNumber)
       ->setCustomerId($order->getDatosprincipales()->init)
       ->setCreatedAt(new \DateTime())
-      ->setTotalRequested(0)
+      ->setTotalRequested($totalRequested)
       ->setTotalDispatched(0)
       ->setEfficiency(0)
       ->setProductsList($productsToDispatch);
@@ -112,11 +118,12 @@ class OrderController extends AbstractController
         ->setId($deliveryData['id'])
         ->setOrderNumber($deliveryData['orderNumber'])
         ->setCustomerId($deliveryData['customerId'])
-        ->setCreatedAt($deliveryData['createdAt'])
+        ->setCreatedAt(new \DateTime())
         ->setTotalRequested($deliveryData['totalRequested'])
         ->setTotalDispatched($deliveryData['totalDispatched'])
         ->setEfficiency($deliveryData['efficiency'])
         ->setProductsList($deliveryData['productsList']);
+      
       $this->entityManager->getRepository(Delivery::class)->update($delivery);
 
 
