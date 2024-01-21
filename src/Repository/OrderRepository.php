@@ -21,19 +21,22 @@ class OrderRepository extends ServiceEntityRepository
     parent::__construct($registry, Order::class);
   }
 
-  public function save (Order $entity, bool $flush = false): void {
+  public function save (Order $entity, bool $flush = false): Order {
 
-    $orderId = $entity->getId() ? $this->findOneBy(['orderNumber' => $entity->getOrderNumber()]) : null;
+    $orderNumberValue = $entity->getOrderNumber();
+    $order = $this->findBy(['orderNumber' => $orderNumberValue]) ?: null;
 
-    if(!$orderId) {
+    if (is_null($order)) {
       $this->getEntityManager()->persist($entity);
 
       if ($flush) {
         $this->getEntityManager()->flush();
       }
     }
+
+    return $entity;
   }
-  
+
   public function update (Order $entity, bool $flush = false): void {
     $this->getEntityManager()->merge($entity);
 

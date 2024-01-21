@@ -92,7 +92,7 @@ class OrderController extends AbstractController
       ->setEfficiency(0)
       ->setProductsList($productsToDispatch);
 
-    $this->entityManager->getRepository(Delivery::class)->save($delivery, true);
+    $delivery = $this->entityManager->getRepository(Delivery::class)->save($delivery, true);
 
     /** 9. The Delivery object is serialized and returned */
 
