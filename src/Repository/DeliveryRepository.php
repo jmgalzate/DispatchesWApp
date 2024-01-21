@@ -20,17 +20,20 @@ class DeliveryRepository extends ServiceEntityRepository
     parent::__construct($registry, Delivery::class);
   }
 
-  public function save (Delivery $entity, bool $flush = false): void {
+  public function save (Delivery $entity, bool $flush = false): Delivery {
 
-    $deliveryId = $entity->getId() ? $this->findOneBy(['orderNumber' => $entity->getOrderNumber()]) : null;
-    
-    if(!$deliveryId) {
+    $orderNumberValue = $entity->getOrderNumber();
+    $delivery = $this->findBy(['orderNumber' => $orderNumberValue]) ?: null;
+
+    if (is_null($delivery)) {
       $this->getEntityManager()->persist($entity);
 
       if ($flush) {
         $this->getEntityManager()->flush();
       }
     }
+
+    return $entity;
   }
 
   public function lastDeliveryRecorded (): int {
@@ -118,11 +121,11 @@ class DeliveryRepository extends ServiceEntityRepository
   public function update (Delivery $delivery): void {
 
     $existingDelivery = $delivery->getId() ? $this->find($delivery->getId()) : null;
-    
+
     $existingDelivery->setTotalDispatched($delivery->getTotalDispatched());
     $existingDelivery->setEfficiency($delivery->getEfficiency());
     $existingDelivery->setProductsList($delivery->getProductsList());
-    
+
     $this->save($existingDelivery, true);
   }
 }
