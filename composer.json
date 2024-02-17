@@ -22,11 +22,7 @@
         "symfony/monolog-bundle": "^3.8",
         "symfony/requirements-checker": "^2.0",
         "symfony/runtime": "6.3.*",
-        "symfony/twig-bundle": "6.3.*",
-        "symfony/ux-twig-component": "*",
-        "symfony/webpack-encore-bundle": "^2.1",
-        "symfony/yaml": "6.3.*",
-        "twbs/bootstrap": "5.0.2"
+        "symfony/yaml": "6.3.*"
     },
     "config": {
         "allow-plugins": {
@@ -78,7 +74,6 @@
         }
     },
     "require-dev": {
-        "symfony/stopwatch": "6.3.*",
-        "symfony/web-profiler-bundle": "6.3.*"
+        "symfony/stopwatch": "6.3.*"
     }
 }
