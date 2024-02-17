@@ -25,13 +25,13 @@ use Doctrine\ORM\Mapping as ORM;
   private ?int $orderNumber = null;
 
   #[ORM\Column(name: 'encabezado', type: 'json')]
-  private ?Header $encabezado;
+  private $encabezado;
 
   #[ORM\Column(name: 'liquidacion', type: 'json')]
-  private ?Settlement $liquidacion;
+  private $liquidacion;
 
   #[ORM\Column(name: 'datos_principales', type: 'json')]
-  private ?MainData $datosprincipales;
+  private $datosprincipales;
 
   /** @var Product[] */
   #[ORM\Column(name: 'lista_productos', type: 'json')]
