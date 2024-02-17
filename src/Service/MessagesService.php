@@ -2,8 +2,8 @@
 
 namespace App\Service;
 
+use App\Entity\Message;
 use App\Entity\Message\Payload;
-use App\Entity\Message\Message;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
