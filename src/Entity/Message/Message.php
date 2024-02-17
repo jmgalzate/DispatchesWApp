@@ -14,16 +14,16 @@ class Message {
     #[ORM\Column(name: 'id', type: 'integer')]
     private ?int $id = null;
     
-    #[ORM\Column(name: 'messagetype', type: 'integer')]
+    #[ORM\Column(name: 'message_type', type: 'integer')]
     private ?int $messageType = null;
 
-    #[ORM\Column(name: 'ordernumber', type: 'integer')]
+    #[ORM\Column(name: 'order_number', type: 'integer')]
     private ?int $orderNumber = null;
     
     #[ORM\Column(name: 'endpoint', type: 'string', length: 255)]
     private ?string $endpoint = null;
     
-    #[ORM\Column(name: 'HttpStatus', type: 'integer')]
+    #[ORM\Column(name: 'http_status', type: 'integer')]
     private ?int $httpStatus = null;
     
     #[ORM\Column(name: 'payload', type: 'text')]
