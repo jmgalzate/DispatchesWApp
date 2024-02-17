@@ -16,30 +16,29 @@ class Delivery implements \JsonSerializable
     #[ ORM\GeneratedValue ]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'orderNumber', type: 'integer')]
+    #[ORM\Column(name: 'order_number', type: 'integer')]
     private ?int $orderNumber = null;
     
-    #[ORM\Column(name: 'customerId', type: 'bigint')]
+    #[ORM\Column(name: 'customer_id', type: 'bigint')]
     private ?int $customerId = null;
     
-    #[ORM\Column(name: 'createdAt', type: 'datetime')]
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
     
-    #[ORM\Column(name: 'totalRequested', type: 'integer')]
+    #[ORM\Column(name: 'total_requested', type: 'integer')]
     private ?int $totalRequested = null;
     
-    #[ORM\Column(name: 'totalDispatched', type: 'integer')]
+    #[ORM\Column(name: 'total_dispatched', type: 'integer')]
     private ?int $totalDispatched = null;
     
     #[ORM\Column(name: 'efficiency', type: 'decimal', precision: 1, scale: 4)]
     private ?float $efficiency = null;
     
-    #[ORM\Column(name: 'productsList', type: 'json')]
-    
+    #[ORM\Column(name: 'products_list', type: 'json')]
     /**
      * @var deliveryProduct[]
      */
-    private ?array $productsList = null;
+    private array $productsList = [];
     
     public function getId (): ?int {
         return $this->id;
