@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
   #[ORM\GeneratedValue]
   private ?int $id = null;
   
-  #[ORM\Column(name: 'orderNumber', type: 'integer')]
+  #[ORM\Column(name: 'order_number', type: 'integer')]
   private ?int $orderNumber = null;
 
   #[ORM\Column(name: 'encabezado', type: 'json')]
@@ -30,11 +30,11 @@ use Doctrine\ORM\Mapping as ORM;
   #[ORM\Column(name: 'liquidacion', type: 'json')]
   private ?Settlement $liquidacion;
 
-  #[ORM\Column(name: 'datosprincipales', type: 'json')]
+  #[ORM\Column(name: 'datos_principales', type: 'json')]
   private ?MainData $datosprincipales;
 
   /** @var Product[] */
-  #[ORM\Column(name: 'listaproductos', type: 'json')]
+  #[ORM\Column(name: 'lista_productos', type: 'json')]
   private array $listaproductos;
 
   #[ORM\Column(name: 'qoprsok', type: 'string', length: 10, nullable: true)]
