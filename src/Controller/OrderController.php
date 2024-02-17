@@ -22,7 +22,7 @@ class OrderController extends AbstractController
   ) {
   }
 
-  #[Route('/order/id={orderNumber}', name: 'getOrder', methods: ['GET'])]
+  #[Route('api/order/id={orderNumber}', name: 'getOrder', methods: ['GET'])]
   public function getOrder (Request $request, int $orderNumber): JsonResponse {
 
     if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
@@ -102,7 +102,7 @@ class OrderController extends AbstractController
     return $jsonResponse;
   }
 
-  #[Route('/order', name: 'updateOrder', methods: ['PUT'])]
+  #[Route('api/order', name: 'updateOrder', methods: ['PUT'])]
   public function updateOrder (Request $request): JsonResponse {
 
     if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
@@ -209,7 +209,7 @@ class OrderController extends AbstractController
     }
   }
 
-  #[Route('/order', name: 'closeOrder', methods: ['POST'])]
+  #[Route('api/order', name: 'closeOrder', methods: ['POST'])]
   public function closeOrder (Request $request): JsonResponse {
 
     if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {

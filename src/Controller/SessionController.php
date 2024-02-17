@@ -18,7 +18,7 @@ class SessionController extends AbstractController
     ) {
     }
 
-    #[Route('/session/login', name: 'app_session_login', methods: ['GET'])]
+    #[Route('api/session/login', name: 'app_session_login', methods: ['GET'])]
     public function login(Request $request): JsonResponse
     {
         if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
@@ -48,7 +48,7 @@ class SessionController extends AbstractController
         return $jsonResponse;
     }
 
-    #[Route('/session/logout', name: 'app_session_logout', methods: ['GET'])]
+    #[Route('api/session/logout', name: 'app_session_logout', methods: ['GET'])]
     public function logout(Request $request): Response
     {
         if (!$request->headers->has('Accept') || $request->headers->get('Accept') !== 'application/json') {
