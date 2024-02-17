@@ -1,5 +1,5 @@
 <?php
-namespace App\Entity\Message;
+namespace App\Entity;
 
 use App\Repository\MessageRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -26,11 +26,11 @@ class Message {
     #[ORM\Column(name: 'http_status', type: 'integer')]
     private ?int $httpStatus = null;
     
-    #[ORM\Column(name: 'payload', type: 'text')]
-    private ?string $payload = null;
+    #[ORM\Column(name: 'payload', type: 'json')]
+    private $payload = null;
     
-    #[ORM\Column(name: 'response', type: 'text')]
-    private ?string $response = null;
+    #[ORM\Column(name: 'response', type: 'json')]
+    private $response = null;
     
     #[ORM\Column(name: 'createdat', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
@@ -75,20 +75,20 @@ class Message {
         return $this;
     }
     
-    public function getPayload(): ?string {
+    public function getPayload() {
         return $this->payload;
     }
 
-    public function setPayload(string $payload): self {
+    public function setPayload($payload): self {
         $this->payload = $payload;
         return $this;
     }
 
-    public function getResponse(): ?string {
+    public function getResponse() {
         return $this->response;
     }
 
-    public function setResponse(string $response): self {
+    public function setResponse($response): self {
         $this->response = $response;
         return $this;
     }
