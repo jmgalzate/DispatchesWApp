@@ -32,7 +32,7 @@ class Message {
     #[ORM\Column(name: 'response', type: 'json')]
     private $response = null;
     
-    #[ORM\Column(name: 'createdat', type: 'datetime')]
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
     
     public function getId(): ?int {
