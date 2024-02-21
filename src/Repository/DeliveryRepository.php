@@ -114,9 +114,7 @@ class DeliveryRepository extends ServiceEntityRepository
     } catch (\Exception $e) {
       return 0.0;
     }
-
   }
-
 
   public function update (Delivery $delivery): void {
 
@@ -125,6 +123,7 @@ class DeliveryRepository extends ServiceEntityRepository
     $existingDelivery->setTotalDispatched($delivery->getTotalDispatched());
     $existingDelivery->setEfficiency($delivery->getEfficiency());
     $existingDelivery->setProductsList($delivery->getProductsList());
+    $existingDelivery->setIsDispatched($delivery->getIsDispatched());
 
     $this->save($existingDelivery, true);
   }
