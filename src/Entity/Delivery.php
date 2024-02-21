@@ -39,6 +39,9 @@ class Delivery implements \JsonSerializable
      * @var deliveryProduct[]
      */
     private array $productsList = [];
+
+    #[ORM\Column(name: 'is_dispatched', type: 'boolean')]
+    private ?bool $isDispatched = null;
     
     public function getId (): ?int {
         return $this->id;
@@ -120,6 +123,16 @@ class Delivery implements \JsonSerializable
     public function setProductsList (array $productsList): self {
         
         $this->productsList = $productsList;
+        return $this;
+    }
+
+    public function getIsDispatched (): ?bool {
+        return $this->isDispatched;
+    }
+
+    public function setIsDispatched (bool $isDispatched): self {
+        $this->isDispatched = $isDispatched;
+
         return $this;
     }
 
