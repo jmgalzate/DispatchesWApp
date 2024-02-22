@@ -157,8 +157,7 @@ class ContapymeService
         return $this->validateResponse($request['body']);
     }
     private function validateResponse (string $response): array {
-        
-        //TODO: validate how to handle the JSON_DECODE exception
+      
         $responseData = json_decode($response, true, 512, JSON_THROW_ON_ERROR |
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
