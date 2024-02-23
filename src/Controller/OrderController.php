@@ -31,42 +31,79 @@ class OrderController extends AbstractController
       return new JsonResponse('Unauthorized', Response::HTTP_UNAUTHORIZED);
     }
 
-    try {
-
-      /** 1. Try to get the order */
-      $orderRequest = $this->contapymeService->agentAction(
-        actionId: 3,
+    $unprocess = function ($orderNumber) {
+      $orderUnprocessed = $this->contapymeService->agentAction(
+        actionId: 2,
         orderNumber: $orderNumber
       );
 
-      if ($orderRequest['code'] !== Response::HTTP_OK)
-        throw new Exception($orderRequest['body']);
+      if ($orderUnprocessed['code'] !== Response::HTTP_OK)
+        throw new Exception($orderUnprocessed['body']);
+    };
 
-      /** 2. Deserialize the order*/
-      $order = Order::fromArray(orderNumber: $orderNumber, orderData: $orderRequest['body']['datos']);
+    try {
 
-      /** 3. Validate if there are products in the Order*/
-      if (empty($order->getListaproductos()))
-        throw new Exception('La orden ' . $orderNumber . ' no tiene productos para despachar.');
+      /**
+       * 7. Check if the delivery is already in the database and if it is dispatched.
+       */
 
+      $deliveryRepository = $this->entityManager->getRepository(Delivery::class);
+      $delivery = $deliveryRepository->findOneBy(['orderNumber' => $orderNumber]);
 
-      /** 4. Check if the order is processed to unprocess it */
-      if ($order->getEncabezado()->iprocess === 0) {
+      if ($delivery) {
 
-        /** 5. Unprocess the order */
-        $orderUnprocessed = $this->contapymeService->agentAction(
-          actionId: 2,
+        if ($delivery->getIsDispatched() === false) {
+
+          $unprocess($orderNumber);
+
+          $jsonResponse = new JsonResponse($delivery->jsonSerialize());
+          $jsonResponse->setStatusCode(Response::HTTP_OK);
+          return $jsonResponse;
+        } else {
+          $jsonResponse = new JsonResponse([
+            'code' => Response::HTTP_ALREADY_REPORTED,
+            'message' => 'La orden ya fue despachada.' //TODO: create arrow function for process again the order. 
+          ]);
+
+          $jsonResponse->setStatusCode(Response::HTTP_ALREADY_REPORTED);
+          return $jsonResponse;
+        }
+      } else {
+        /** 1. Try to get the order */
+        $orderRequest = $this->contapymeService->agentAction(
+          actionId: 3,
           orderNumber: $orderNumber
         );
 
-        if ($orderUnprocessed['code'] !== Response::HTTP_OK)
-          throw new Exception($orderUnprocessed['body']);
+        if ($orderRequest['code'] !== Response::HTTP_OK)
+          throw new Exception($orderRequest['body']);
 
-        $order->setIprocess(2); // 2 = Unprocessed
+        /** 2. Deserialize the order*/
+        $order = Order::fromArray(orderNumber: $orderNumber, orderData: $orderRequest['body']['datos']);
+
+        /** 3. Validate if there are products in the Order*/
+        if (empty($order->getListaproductos()))
+          throw new Exception('La orden ' . $orderNumber . ' no tiene productos para despachar.');
+
+
+        /** 4. Check if the order is processed to unprocess it */
+        if ($order->getEncabezado()->iprocess === 0) {
+
+          /** 5. Unprocess the order */
+          $orderUnprocessed = $this->contapymeService->agentAction(
+            actionId: 2,
+            orderNumber: $orderNumber
+          );
+
+          if ($orderUnprocessed['code'] !== Response::HTTP_OK)
+            throw new Exception($orderUnprocessed['body']);
+
+          $order->setIprocess(2); // 2 = Unprocessed
+        }
+
+        /** 6. The Order is recorded in the DB */
+        $this->entityManager->getRepository(Order::class)->save($order);
       }
-
-      /** 6. The Order is recorded in the DB */
-      $this->entityManager->getRepository(Order::class)->save($order);
     } catch (Exception $e) {
       return new JsonResponse([
         'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
@@ -74,29 +111,6 @@ class OrderController extends AbstractController
       ]);
     }
 
-    /**
-     * 7. Check if the delivery is already in the database and if it is dispatched.
-     */
-
-    $deliveryRepository = $this->entityManager->getRepository(Delivery::class);
-    $delivery = $deliveryRepository->findOneBy(['orderNumber' => $orderNumber]);
-
-    if ($delivery) {
-
-      if ($delivery->getIsDispatched() === false) {
-        $jsonResponse = new JsonResponse($delivery->jsonSerialize());
-        $jsonResponse->setStatusCode(Response::HTTP_OK);
-        return $jsonResponse;
-      }
-
-      $jsonResponse = new JsonResponse([
-        'code' => Response::HTTP_OK,
-        'message' => 'La orden ya fue despachada.' //TODO: create arrow function for process again the order. 
-      ]);
-
-      $jsonResponse->setStatusCode(Response::HTTP_OK);
-      return $jsonResponse;
-    }
 
     /** 8. Set the products to Dispatch */
     $productsToDispatch = $this->productService->setProductsLists($order->getListaproductos());
