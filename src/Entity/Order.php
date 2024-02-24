@@ -125,7 +125,7 @@ use Doctrine\ORM\Mapping as ORM;
   }
   
   public function setIusuarioult (string $iusuarioult): self {
-    $this->encabezado->iusuarioult = $iusuarioult;
+    $this->encabezado['iusuarioult'] = $iusuarioult;
 
     return $this;
   }
