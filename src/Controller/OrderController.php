@@ -168,7 +168,7 @@ class OrderController extends AbstractController
         ->setProductsList($deliveryData['productsList'])
         ->setIsDispatched(true);
 
-      // $this->entityManager->getRepository(Delivery::class)->save($delivery, true);
+      $this->entityManager->getRepository(Delivery::class)->save($delivery, true);
 
       /** Getting the Order from the Database */
       $order = $this->entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $delivery->getOrderNumber()]);
