@@ -165,11 +165,10 @@ class OrderController extends AbstractController
         ->setTotalRequested($deliveryData['totalRequested'])
         ->setTotalDispatched($deliveryData['totalDispatched'])
         ->setEfficiency($deliveryData['efficiency'])
-        ->setProductsList($deliveryData['productsList']
-          ->setIsDispatched(true));
+        ->setProductsList($deliveryData['productsList'])
+        ->setIsDispatched(true);
 
-      $this->entityManager->getRepository(Delivery::class)->save($delivery, true);
-
+      // $this->entityManager->getRepository(Delivery::class)->save($delivery, true);
 
       /** Getting the Order from the Database */
       $order = $this->entityManager->getRepository(Order::class)->findOneBy(['orderNumber' => $delivery->getOrderNumber()]);
@@ -182,18 +181,18 @@ class OrderController extends AbstractController
       $productsList = [];
 
       foreach ($order->getListaproductos() as $requestedProduct) {
-
         foreach ($delivery->getProductsList() as $dispatchedProduct) {
-          if ($requestedProduct->irecurso === $dispatchedProduct->getCode()) {
 
-            if ($dispatchedProduct->getDeliveredQuantity() !== 0) {
-              $requestedProduct->qrecurso = $dispatchedProduct->getDeliveredQuantity();
+          if ($requestedProduct['irecurso'] === $dispatchedProduct['code']) {
 
-              $newPrice = $requestedProduct->qrecurso * $requestedProduct->mprecio;
-              $discount = $requestedProduct->qporcdescuento / 100;
+            if ($dispatchedProduct['deliveredQuantity'] !== 0) {
+              $requestedProduct['qrecurso'] = $dispatchedProduct['deliveredQuantity'];
 
-              $requestedProduct->mvrtotal = ($newPrice - ($newPrice * $discount));
+              $newPrice = $requestedProduct['qrecurso'] * $requestedProduct['mprecio'];
+              $discount = $requestedProduct['qporcdescuento'] / 100;
 
+              $requestedProduct['mvrtotal'] = ($newPrice - ($newPrice * $discount));
+  
               $productsList[] = $requestedProduct;
             }
           }
@@ -204,7 +203,6 @@ class OrderController extends AbstractController
 
       /** Update the Order in the database */
       $this->entityManager->getRepository(Order::class)->update($order);
-
 
       $orderSaved = $this->contapymeService->agentAction(
         actionId: 4,
@@ -223,8 +221,7 @@ class OrderController extends AbstractController
 
       if ($orderTaxes['code'] !== Response::HTTP_OK)
         throw new Exception('Falló el intento de "Calcular los Impuestos" de la orden en Contapyme; por favor valide los logs para obtener más detalles de la transacción.');
-
-
+      
       /** 2. Try to process the Order */
       $orderProcessed = $this->contapymeService->agentAction(
         actionId: 6,
